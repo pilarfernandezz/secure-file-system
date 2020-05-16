@@ -10,17 +10,18 @@ public class LoginView extends Frame implements ActionListener {
     private Font titleFont = new Font("Monospaced", Font.BOLD, 30);
     private JLabel lblTitle;
     private JLabel lblText;
-    private JLabel lblName1;
-    private JLabel lblName2;
-    public static JTextField txtfName1 = null;
-    public static JTextField txtfName2 = null;
-    public static JButton btnStart;
-    public static JButton btnCancel;
+    private JLabel lblEmail;
+    private JLabel lblPassword;
+    private static JTextField txtEmail = null;
+    private static JPasswordField passPassword = null;
+    private static JButton btnStart;
+    private static JButton btnCancel;
 
     public LoginView(){
-        // VER PORQUE TA BUGADO SÁ CASSETA LABELSSSSSS  :@
         super();
-        this.panel = new JPanel();
+
+        this.setBackground(Color.WHITE);
+
         lblTitle = new JLabel("Sistema de arquivos seguro");
         lblTitle.setBounds(160, -250, 800, 600);
         lblTitle.setFont(titleFont);
@@ -28,24 +29,24 @@ public class LoginView extends Frame implements ActionListener {
         this.panel.add(lblTitle);
 
         lblText = new JLabel("Faça seu login:");
-        lblText.setBounds(295, 100, 200, 50);
+        lblText.setBounds(340, 100, 200, 50);
         this.panel.add(lblText);
 
-        lblName1 = new JLabel("Email:");
-        lblName1.setBounds(250, 150, 100, 50);
-        this.panel.add(lblName1);
+        lblEmail = new JLabel("Email:");
+        lblEmail.setBounds(250, 150, 100, 50);
+        this.panel.add(lblEmail);
 
-        txtfName1 = new JTextField();
-        txtfName1.setBounds(320, 160, 200, 30);
-        this.panel.add(txtfName1);
+        txtEmail = new JTextField();
+        txtEmail.setBounds(320, 160, 200, 30);
+        this.panel.add(txtEmail);
 
-        lblName2 = new JLabel("Senha:");
-        lblName2.setBounds(250, 200, 100, 50);
-        this.panel.add(lblName2);
+        lblPassword = new JLabel("Senha:");
+        lblPassword.setBounds(250, 200, 100, 50);
+        this.panel.add(lblPassword);
 
-        txtfName2 = new JTextField();
-        txtfName2.setBounds(320, 210, 200, 30);
-        this.panel.add(txtfName2);
+        passPassword = new JPasswordField(8);
+        passPassword.setBounds(320, 210, 200, 30);
+        this.panel.add(passPassword);
 
         btnStart = new JButton("Entrar");
         btnStart.setBounds(280, 300, 100, 40);
@@ -67,9 +68,7 @@ public class LoginView extends Frame implements ActionListener {
     }
 
     public static void showScreen(){
-        if(instance == null){
-            instance = new LoginView();
-        }
+        new LoginView();
     }
 
     @Override
@@ -78,6 +77,7 @@ public class LoginView extends Frame implements ActionListener {
         if(e.getSource() == btnStart){
 			this.setVisible(false);
 			this.dispose();
+			MenuView.showScreen();
 			//Facade.getFacadeInstance().criarJogadores(getNomeJogador(1), getNomeJogador(2));
 			//Facade.getFacadeInstance().posicionarArmasJogador(1);
 

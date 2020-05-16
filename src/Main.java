@@ -1,9 +1,7 @@
 import jdk.nashorn.internal.objects.NativeJSON;
 import models.User;
 import repositories.UserRepository;
-import views.LoginView;
-import views.MenuView;
-import views.RegisterView;
+import views.*;
 
 import java.sql.SQLException;
 
@@ -25,8 +23,10 @@ public class Main {
 //        temp = userRepository.getUser("user1@gmail.com");
 //
 //        System.out.println(temp);
-        //new LoginView();
-        new RegisterView();
+         LoginView.showScreen();
+        //new RegisterView();
+       //new ChangePwView();
+        //new ExitView();
         //new MenuView();
     }
 }
