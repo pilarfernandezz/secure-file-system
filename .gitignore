@@ -1,0 +1,10 @@
+.idea/*
+*.iml
+Files/*
+Keys/*
+*.asd
+*.enc
+*.env
+*.key
+*.crt
+out/*
