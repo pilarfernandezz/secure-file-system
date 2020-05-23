@@ -1,5 +1,7 @@
 package views;
 
+import facade.Facade;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -92,7 +94,11 @@ public class ChangePwView extends Frame implements ActionListener {
         if(e.getSource() == btnRegister){
             this.setVisible(false);
             this.dispose();
-            //TODO REALIZAR AÇOES DE TROCA DE SENHA E APÓS ISSO IR PARA MENU
+            try {
+                Facade.getFacadeInstance().updateUser(certificatePath.getText(), password.getText(), passwordConfirmation.getText());
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
             MenuView.showScreen();
 
         } else if(e.getSource() == btnReturn) {

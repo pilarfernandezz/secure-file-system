@@ -55,10 +55,21 @@ public class UserRepository {
                 throw new Exception("Usuário "+ user.getEmail() + " já existe");
             }
 
+
+            if(!user.getPassword().equals(user.getPasswordConfirmation())){
+                System.out.println("aqui");
+                throw new Exception("Senhas não coincidem");
+            }
+
+            if(user.getPassword() == null || user.getPasswordConfirmation() == null || user.getCertificatePath() == null){
+                throw new Exception("Campos em branco");
+            }
+
+
             String query = "update users set email = ?, password = ?, name = ?, user_group = ?, certificate = ? where id = ?";
             PreparedStatement ps = this.conn.prepareStatement(query);
             ps.setString(1, user.getEmail());
-            ps.setString(2, user.getPassword());
+            ps.setString(2, user.getPassword() + this.saltGenerator());
             ps.setString(3, user.getName());
             ps.setString(4, user.getGroup());
             ps.setString(5, user.getCertificatePath());

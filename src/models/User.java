@@ -11,6 +11,7 @@ public class User {
     private String group;
     private String certificatePath;
     private Certificate certificate = new Certificate(certificatePath);
+    private boolean allowed = true;
 
     public User(String password, String passwordConfirmation, String group, String certificatePath) {
         this.passwordConfirmation = passwordConfirmation;
@@ -21,18 +22,6 @@ public class User {
         this.certificatePath = certificatePath;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", name='" + name + '\'' +
-                ", group='" + group + '\'' +
-                ", certificatePath='" + certificatePath + '\'' +
-                ", certificate=" + certificate +
-                '}';
-    }
 
     public String getCertificatePath() {
         return certificatePath;
@@ -80,5 +69,28 @@ public class User {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isAllowed() {
+        return allowed;
+    }
+
+    public void setAllowed(boolean allowed) {
+        this.allowed = allowed;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", passwordConfirmation='" + passwordConfirmation + '\'' +
+                ", name='" + name + '\'' +
+                ", group='" + group + '\'' +
+                ", certificatePath='" + certificatePath + '\'' +
+                ", certificate=" + certificate +
+                ", allowed=" + allowed +
+                '}';
     }
 }

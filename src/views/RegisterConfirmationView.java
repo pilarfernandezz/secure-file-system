@@ -8,26 +8,27 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
-public class RegisterView extends Frame implements ActionListener {
-    private static RegisterView instance;
+public class RegisterConfirmationView extends Frame implements ActionListener {
+    private static RegisterConfirmationView instance;
     private Font titleFont = new Font("Monospaced", Font.BOLD, 30);
-    private JLabel lblTitle;
-    private JLabel lblText;
+    private static String password;
+    private static String passwordConfirmation;
+    private static String certificatePath;
+    private static String group;
+    private JLabel lblPassword;
+    private JLabel getLblPasswordConfirmation;
     private JLabel lblCertificate;
     private JLabel lblGroup;
-    private JLabel lblPassword;
+    private JLabel lblTitle;
+    private JLabel lblText;
     private JLabel lblPasswordConfirmation;
     private JLabel lblTotal;
     private JLabel lblTotalQtd;
-    private static JTextField certificatePath = null;
-    private static JTextField group = null;
-    private static JPasswordField password = null;
-    private static JPasswordField passwordConfirmation = null;
     private static JButton btnRegister;
     private static JButton btnReturn;
     private int totalQtd =0;
 
-    public RegisterView(){
+    public RegisterConfirmationView(){
         super();
 
         this.setBackground(Color.WHITE);
@@ -46,41 +47,25 @@ public class RegisterView extends Frame implements ActionListener {
         lblTotalQtd.setBounds(470, -160, 800, 600);
         this.panel.add(lblTotalQtd);
 
-        lblText = new JLabel("Cadastro:");
-        lblText.setBounds(350, -120, 800, 600);
+        lblText = new JLabel("Confirmação cadastro:");
+        lblText.setBounds(300, -120, 800, 600);
         this.panel.add(lblText);
 
-        lblCertificate = new JLabel("Caminho do certificado digital:");
-        lblCertificate.setBounds(50, 190, 300, 50);
+        lblCertificate = new JLabel("Caminho do certificado digital: " + RegisterConfirmationView.certificatePath );
+        lblCertificate.setBounds(110, 190, 300, 50);
         this.panel.add(lblCertificate);
 
-        certificatePath = new JTextField();
-        certificatePath.setBounds(250, 200, 500, 30);
-        this.panel.add(certificatePath);
-
-        lblGroup = new JLabel("Grupo:");
-        lblGroup.setBounds(50, 240, 300, 50);
+        lblGroup = new JLabel("Grupo: " + RegisterConfirmationView.group);
+        lblGroup.setBounds(110, 240, 300, 50);
         this.panel.add(lblGroup);
 
-        group = new JTextField();
-        group.setBounds(250, 250, 500, 30);
-        this.panel.add(group);
-
-        lblPassword = new JLabel("Senha:");
-        lblPassword.setBounds(50, 290, 300, 50);
+        lblPassword = new JLabel("Senha: " + RegisterConfirmationView.password);
+        lblPassword.setBounds(110, 290, 300, 50);
         this.panel.add(lblPassword);
 
-        password = new JPasswordField(8);
-        password.setBounds(250, 300, 500, 30);
-        this.panel.add(password);
-
-        lblPasswordConfirmation = new JLabel("Confirmação senha:");
-        lblPasswordConfirmation.setBounds(50, 340, 300, 50);
-        this.panel.add(lblPasswordConfirmation);
-
-        passwordConfirmation = new JPasswordField(8);
-        passwordConfirmation.setBounds(250, 350, 500, 30);
-        this.panel.add(passwordConfirmation);
+        lblPassword = new JLabel("Confirmação de senha: " + RegisterConfirmationView.passwordConfirmation);
+        lblPassword.setBounds(110, 340, 300, 50);
+        this.panel.add(lblPassword);
 
         btnRegister = new JButton("Registrar");
         btnRegister.setBounds(280, 450, 100, 40);
@@ -105,16 +90,25 @@ public class RegisterView extends Frame implements ActionListener {
         if(e.getSource() == btnRegister){
             this.setVisible(false);
             this.dispose();
-            RegisterConfirmationView.showScreen(certificatePath.getText(), group.getText(), password.getText(), passwordConfirmation.getText());
+            try {
+                Facade.getFacadeInstance().registerUser(certificatePath, group, password, passwordConfirmation);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+            MenuView.showScreen();
         } else if(e.getSource() == btnReturn){
             this.setVisible(false);
             this.dispose();
-            MenuView.showScreen();
+            RegisterView.showScreen();
         }
     }
 
-    public static void showScreen(){
-        new RegisterView();
+    public static void showScreen(String certificatePath,String group, String password, String passwordConfirmation){
+        RegisterConfirmationView.certificatePath = certificatePath;
+        RegisterConfirmationView.group = group;
+        RegisterConfirmationView.password = password;
+        RegisterConfirmationView.passwordConfirmation = passwordConfirmation;
+        new RegisterConfirmationView();
     }
 
     public int getTotalQtd() {

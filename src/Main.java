@@ -1,16 +1,15 @@
 import models.User;
 import repositories.UserRepository;
-import services.Authentication;
-import views.RegisterView;
+import views.EmailView;
 
 import java.sql.SQLException;
 
 public class Main {
     public static void main(String args[]) throws SQLException {
-        User user2 = new User("", "" ,"", "");
-        UserRepository userRepository = new UserRepository();
-////
-        userRepository.createUser(user2);
+//        User user2 = new User("", "" ,"", "");
+//        UserRepository userRepository = new UserRepository();
+//////
+//        userRepository.createUser(user2);
 
 //       Authentication authentication = new Authentication("pilar@gmail.com", "23456");
 //       boolean res = authentication.login();
@@ -20,8 +19,11 @@ public class Main {
 //       logged = authentication.getLoggedUser();
 //       System.out.println(logged);
 //       System.out.println(res);
-
-
+//        UserRepository userRepository = new UserRepository();
+//        User u=userRepository.getUser("pilar@gmail.com");
+//
+//
+//        System.out.println(u);
 //        userRepository.createUser(user2);
 //
 //        user2 = userRepository.getUser("user2@gmail.com");
@@ -32,6 +34,8 @@ public class Main {
 //        User temp;
 //        temp = userRepository.getUser("user1@gmail.com");
 //
+
+        new EmailView();
 //        System.out.println(temp);
         // LoginView.showScreen();
         //new RegisterView();

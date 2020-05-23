@@ -1,5 +1,8 @@
 package views;
 
+import models.User;
+import services.Authentication;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -46,6 +49,7 @@ public class MenuView extends Frame implements ActionListener {
         btnRegister.setBounds(180, 250, 200, 40);
         this.panel.add(btnRegister);
         btnRegister.addActionListener(this);
+        if(!this.isAllowed()) btnRegister.setEnabled(false);
 
         btnChange = new JButton("Alterar senha e certificado");
         btnChange.setBounds(410, 250, 200, 40);
@@ -93,6 +97,12 @@ public class MenuView extends Frame implements ActionListener {
         } else {
             System.exit(1);
         }
+    }
+
+    public boolean isAllowed(){
+        User user = Authentication.getAuthenticationInstance().getLoggedUser();
+        if(user.getGroup().equals("administrador")) return true;
+        return false;
     }
 
     public static void showScreen(){
