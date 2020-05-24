@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class ChangePwView extends Frame implements ActionListener {
     private static ChangePwView instance;
@@ -99,12 +100,20 @@ public class ChangePwView extends Frame implements ActionListener {
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
-            MenuView.showScreen();
+            try {
+                MenuView.showScreen();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
 
         } else if(e.getSource() == btnReturn) {
             this.setVisible(false);
             this.dispose();
-            MenuView.showScreen();
+            try {
+                MenuView.showScreen();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         }
     }
 

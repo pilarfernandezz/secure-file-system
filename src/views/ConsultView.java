@@ -5,6 +5,7 @@ import javax.swing.plaf.basic.BasicDirectoryModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.jar.JarEntry;
 
 public class ConsultView extends Frame implements ActionListener {
@@ -77,7 +78,11 @@ public class ConsultView extends Frame implements ActionListener {
         if(e.getSource() == btnReturn){
             this.setVisible(false);
             this.dispose();
-            MenuView.showScreen();
+            try {
+                MenuView.showScreen();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         }
     }
 

@@ -5,13 +5,16 @@ import repositories.UserRepository;
 public class User {
     private int id;
     private String email;
+    private String salt;
     private String password;
     private String passwordConfirmation;
     private String name;
     private String group;
+
+
     private String certificatePath;
     private Certificate certificate = new Certificate(certificatePath);
-    private boolean allowed = true;
+    private boolean allowed;
 
     public User(String password, String passwordConfirmation, String group, String certificatePath) {
         this.passwordConfirmation = passwordConfirmation;
@@ -20,6 +23,7 @@ public class User {
         this.email = certificate.getEmail();
         this.group = group;
         this.certificatePath = certificatePath;
+        this.allowed = true;
     }
 
 
@@ -93,4 +97,13 @@ public class User {
                 ", allowed=" + allowed +
                 '}';
     }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
+
 }

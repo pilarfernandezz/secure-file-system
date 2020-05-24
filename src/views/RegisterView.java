@@ -17,6 +17,7 @@ public class RegisterView extends Frame implements ActionListener {
     private JLabel lblGroup;
     private JLabel lblPassword;
     private JLabel lblPasswordConfirmation;
+    private JLabel lblAlert;
     private JLabel lblTotal;
     private JLabel lblTotalQtd;
     private static JTextField certificatePath = null;
@@ -66,7 +67,7 @@ public class RegisterView extends Frame implements ActionListener {
         group.setBounds(250, 250, 500, 30);
         this.panel.add(group);
 
-        lblPassword = new JLabel("Senha:");
+        lblPassword = new JLabel("Senha númerica:");
         lblPassword.setBounds(50, 290, 300, 50);
         this.panel.add(lblPassword);
 
@@ -81,6 +82,12 @@ public class RegisterView extends Frame implements ActionListener {
         passwordConfirmation = new JPasswordField(8);
         passwordConfirmation.setBounds(250, 350, 500, 30);
         this.panel.add(passwordConfirmation);
+
+        lblAlert = new JLabel("Senha deve ter entre 6 e 8 caracteres numéricos");
+        lblAlert.setForeground(Color.red);
+        lblAlert.setBounds(240, 390, 300, 50);
+        this.panel.add(lblAlert);
+        lblAlert.setVisible(false);
 
         btnRegister = new JButton("Registrar");
         btnRegister.setBounds(280, 450, 100, 40);
@@ -103,13 +110,22 @@ public class RegisterView extends Frame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == btnRegister){
-            this.setVisible(false);
-            this.dispose();
-            RegisterConfirmationView.showScreen(certificatePath.getText(), group.getText(), password.getText(), passwordConfirmation.getText());
+            if(password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+")){
+                lblAlert.setVisible(true);
+                this.panel.repaint();
+            } else {
+                this.setVisible(false);
+                this.dispose();
+                RegisterConfirmationView.showScreen(certificatePath.getText(), group.getText(), password.getText(), passwordConfirmation.getText());
+            }
         } else if(e.getSource() == btnReturn){
             this.setVisible(false);
             this.dispose();
-            MenuView.showScreen();
+            try {
+                MenuView.showScreen();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         }
     }
 

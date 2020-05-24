@@ -16,6 +16,7 @@ public class EmailView extends Frame implements ActionListener {
     private JLabel lblText;
     private JLabel lblEmail;
     private JLabel lblAlert;
+    private JLabel lblAlert1;
     private static JTextField txtEmail = null;
     private static JButton btnStart;
     private static JButton btnCancel;
@@ -49,6 +50,12 @@ public class EmailView extends Frame implements ActionListener {
         this.panel.add(lblAlert);
         lblAlert.setVisible(false);
 
+        lblAlert1 = new JLabel("Usuário bloqueado.");
+        lblAlert1.setForeground(Color.red);
+        lblAlert1.setBounds(320, 200, 200, 50);
+        this.panel.add(lblAlert1);
+        lblAlert1.setVisible(false);
+
         btnStart = new JButton("Seguir");
         btnStart.setBounds(280, 300, 100, 40);
         this.panel.add(btnStart);
@@ -77,17 +84,27 @@ public class EmailView extends Frame implements ActionListener {
         if(e.getSource() == btnStart){
             try {
                 if(Facade.getFacadeInstance().checkEmail(this.txtEmail.getText())){
-                    this.setVisible(false);
-                    this.dispose();
-                    PasswordView.showScreen(this.txtEmail.getText());
+                    if(Facade.getFacadeInstance().verifyIsLocked(this.txtEmail.getText())){
+                        System.out.println("entrei view");
+                        lblAlert1.setVisible(true);
+                        this.panel.repaint();
+                    } else {
+                        User user = Facade.findUser(this.txtEmail.getText());
+                        System.out.println(" ddd " + user);
+                        this.setVisible(false);
+                        this.dispose();
+                        PasswordView.showScreen(this.txtEmail.getText());
+                    }
+
                 } else {
                     lblAlert.setVisible(true);
                     this.panel.repaint();
                 }
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
-
         } else if(e.getSource() == btnCancel){
 			System.exit(1);
 		}

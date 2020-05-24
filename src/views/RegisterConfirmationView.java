@@ -94,8 +94,14 @@ public class RegisterConfirmationView extends Frame implements ActionListener {
                 Facade.getFacadeInstance().registerUser(certificatePath, group, password, passwordConfirmation);
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
-            MenuView.showScreen();
+            try {
+                MenuView.showScreen();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         } else if(e.getSource() == btnReturn){
             this.setVisible(false);
             this.dispose();
