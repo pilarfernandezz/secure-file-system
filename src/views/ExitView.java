@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class ExitView extends Frame implements ActionListener {
     private static ExitView instance;
@@ -68,7 +69,11 @@ public class ExitView extends Frame implements ActionListener {
         } else if(e.getSource() == btnReturn){
             this.setVisible(false);
             this.dispose();
-            MenuView.showScreen();
+            try {
+                MenuView.showScreen();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         }
     }
 

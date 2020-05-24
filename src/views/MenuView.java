@@ -1,10 +1,13 @@
 package views;
 
+import models.User;
+import services.AuthenticationService;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
+import java.sql.SQLException;
 
 public class MenuView extends Frame implements ActionListener {
     private static MenuView instance;
@@ -19,7 +22,7 @@ public class MenuView extends Frame implements ActionListener {
     private static JButton btnExit;
     private int totalQtd = 0;
 
-    public MenuView(){
+    public MenuView() throws SQLException {
         super();
 
         this.setBackground(Color.WHITE);
@@ -46,6 +49,7 @@ public class MenuView extends Frame implements ActionListener {
         btnRegister.setBounds(180, 250, 200, 40);
         this.panel.add(btnRegister);
         btnRegister.addActionListener(this);
+        if(!this.isAdmin()) btnRegister.setEnabled(false);
 
         btnChange = new JButton("Alterar senha e certificado");
         btnChange.setBounds(410, 250, 200, 40);
@@ -95,7 +99,14 @@ public class MenuView extends Frame implements ActionListener {
         }
     }
 
-    public static void showScreen(){
+    public boolean isAdmin() throws SQLException {
+        User user = AuthenticationService.getAuthenticationInstance().getLoggedUser();
+        System.out.println(user);
+        if(user.getGroup().equals("administrator")) return true;
+        return false;
+    }
+
+    public static void showScreen() throws SQLException {
         new MenuView();
     }
 

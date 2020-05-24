@@ -1,9 +1,12 @@
 package views;
 
+import facade.Facade;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 public class ChangePwView extends Frame implements ActionListener {
     private static ChangePwView instance;
@@ -92,13 +95,25 @@ public class ChangePwView extends Frame implements ActionListener {
         if(e.getSource() == btnRegister){
             this.setVisible(false);
             this.dispose();
-            //TODO REALIZAR AÇOES DE TROCA DE SENHA E APÓS ISSO IR PARA MENU
-            MenuView.showScreen();
+            try {
+                Facade.getFacadeInstance().updateUser(certificatePath.getText(), password.getText(), passwordConfirmation.getText());
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+            try {
+                MenuView.showScreen();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
 
         } else if(e.getSource() == btnReturn) {
             this.setVisible(false);
             this.dispose();
-            MenuView.showScreen();
+            try {
+                MenuView.showScreen();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         }
     }
 
