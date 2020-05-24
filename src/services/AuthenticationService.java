@@ -1,6 +1,5 @@
 package services;
 
-import facade.Facade;
 import models.LockedUser;
 import models.User;
 import repositories.LockedUserRepository;
@@ -8,7 +7,6 @@ import repositories.UserRepository;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
 public class AuthenticationService {
@@ -43,7 +41,6 @@ public class AuthenticationService {
         }
         return false;
     }
-
     public void makeUserLogged(String email) throws SQLException {
             this.loggedUser= userRepository.getUser(email);
     }

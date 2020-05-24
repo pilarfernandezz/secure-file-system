@@ -1,7 +1,5 @@
 package models;
 
-import repositories.UserRepository;
-
 public class User {
     private int id;
     private String email;
