@@ -20,14 +20,15 @@ public class UserRepository {
 
     public void createUser(User user) {
         try {
-            String query = "insert into users values(?,?,?,?,?,?);";
+            String query = "insert into users (id,email,password,name,user_group, certificate,salt) values(?,?,?,?,?,?,?);";
             PreparedStatement ps = this.conn.prepareStatement(query);
             ps.setInt(1, this.getNextId());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPassword());
             ps.setString(4, user.getName());
             ps.setString(5, user.getGroup());
-            ps.setString(6, user.getCertificatePath());
+            ps.setString(6, user.getCertificate());
+            ps.setString(7, user.getSalt());
 
             ps.execute();
             System.out.println("Usuário criado com sucesso");

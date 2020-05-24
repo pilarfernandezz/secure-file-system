@@ -1,5 +1,7 @@
 package models;
 
+import services.DigitalCertificateService;
+
 public class User {
     private int id;
     private String email;
@@ -8,22 +10,25 @@ public class User {
     private String passwordConfirmation;
     private String name;
     private String group;
-
-
     private String certificatePath;
-    private Certificate certificate = new Certificate(certificatePath);
+    private String certificate;
     private boolean allowed;
 
     public User(String password, String passwordConfirmation, String group, String certificatePath) {
         this.passwordConfirmation = passwordConfirmation;
         this.password = password ;
-        this.name = certificate.getName();
-        this.email = certificate.getEmail();
         this.group = group;
         this.certificatePath = certificatePath;
         this.allowed = true;
     }
 
+    public String getCertificate() {
+        return certificate;
+    }
+
+    public void setCertificate(String certificate) {
+        this.certificate = certificate;
+    }
 
     public String getCertificatePath() {
         return certificatePath;
@@ -104,4 +109,11 @@ public class User {
         this.salt = salt;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

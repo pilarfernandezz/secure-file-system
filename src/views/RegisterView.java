@@ -1,5 +1,6 @@
 package views;
 
+import exceptions.InvalidExtractionCertificateOwnerInfoException;
 import facade.Facade;
 
 import javax.swing.*;
@@ -63,6 +64,7 @@ public class RegisterView extends Frame implements ActionListener {
         lblGroup.setBounds(50, 240, 300, 50);
         this.panel.add(lblGroup);
 
+        // TODO TROCAR PARA TOGGLE BUTTON TIPOS ADMINISTRATOR E USUÁRIO
         group = new JTextField();
         group.setBounds(250, 250, 500, 30);
         this.panel.add(group);
@@ -116,7 +118,11 @@ public class RegisterView extends Frame implements ActionListener {
             } else {
                 this.setVisible(false);
                 this.dispose();
-                RegisterConfirmationView.showScreen(certificatePath.getText(), group.getText(), password.getText(), passwordConfirmation.getText());
+                try {
+                    RegisterConfirmationView.showScreen(certificatePath.getText(), group.getText(), password.getText(), passwordConfirmation.getText());
+                } catch (InvalidExtractionCertificateOwnerInfoException invalidExtractionCertificateOwnerInfoException) {
+                    invalidExtractionCertificateOwnerInfoException.printStackTrace();
+                }
             }
         } else if(e.getSource() == btnReturn){
             this.setVisible(false);

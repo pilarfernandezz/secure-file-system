@@ -1,29 +1,41 @@
 package services;
 
+import exceptions.InvalidCertificateException;
+import exceptions.InvalidExtractionCertificateOwnerInfoException;
 import models.LockedUser;
 import models.User;
 import repositories.LockedUserRepository;
 import repositories.UserRepository;
 
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Random;
 
 public class AuthenticationService {
     private static AuthenticationService instancia;
-
     private String email;
     private String password;
     private User loggedUser;
     private static UserRepository userRepository;
     private static LockedUserRepository lockedUserRepository;
+    private static DigitalCertificateService digitalCertificateService;
 
     public static AuthenticationService getAuthenticationInstance() throws SQLException {
         userRepository = UserRepository.getUserRepositoryInstance();
         lockedUserRepository = LockedUserRepository.getLockedUserRepositoryInstance();
+        digitalCertificateService = DigitalCertificateService.getDigitalCertificateServiceInstance();
         if (instancia == null)
             instancia = new AuthenticationService();
         return instancia;
+    }
+
+    public static void getDataFromCertificate(User user, String path) throws FileNotFoundException, InvalidCertificateException, InvalidExtractionCertificateOwnerInfoException {
+        Map<String, String> data = digitalCertificateService.extractCertificateOwnerInfo(path);
+        user.setName(data.get("CN"));
+        user.setEmail(data.get("EMAILADDRESS"));
+        user.setCertificate(data.get("CERTIFICATE"));
     }
 
     public boolean checkEmail(String email) throws SQLException {
@@ -50,6 +62,9 @@ public class AuthenticationService {
         User user = new User(password + salt, passwordConfirmation + salt, group, certificatePath);
         user.setSalt(salt);
         String errors = this.verifyFields(user);
+
+        AuthenticationService.getDataFromCertificate(user,certificatePath);
+
         if (errors != "") {
             throw new Exception(errors);
         }
@@ -57,7 +72,8 @@ public class AuthenticationService {
         if (userRepository.getUser(user.getEmail()) != null) {
             throw new Exception("Usuário " + user.getEmail() + " já existe");
         }
-        if (user.getPassword() != user.getPasswordConfirmation()) {
+        System.out.println(user.getPassword() + " " + user.getPasswordConfirmation());
+        if (!user.getPassword().equals(user.getPasswordConfirmation())) {
             throw new Exception("Senhas não coincidem");
         }
 

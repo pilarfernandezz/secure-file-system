@@ -29,8 +29,9 @@ public class PasswordView extends Frame implements ActionListener {
     private JButton btn3;
     private JButton btn4;
     private JButton btn5;
+    private JButton btndelete;
     private int contPress = 0;
-    private boolean passwordPass = false;
+    private boolean passwordIsValid = false;
 
     public PasswordView(){
         super();
@@ -78,10 +79,15 @@ public class PasswordView extends Frame implements ActionListener {
         btn4.addActionListener(this);
 
         btn5 = new JButton(numbers[8] + " ou " + numbers[9]);
-        btn5.setBounds(340, 280, 80, 40);
+        btn5.setBounds(300, 280, 80, 40);
         this.panel.add(btn5);
         btn5.addActionListener(this);
         this.generateOrder();
+
+        btndelete = new JButton("LIMPAR");
+        btndelete.setBounds(380, 280, 80, 40);
+        this.panel.add(btndelete);
+        btndelete.addActionListener(this);
 
         lblAlert = new JLabel("Senha incorreta.");
         lblAlert.setForeground(Color.red);
@@ -138,6 +144,13 @@ public class PasswordView extends Frame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if(e.getSource() == btndelete){
+            contPress = 0;
+            passPassword.setText("");
+            passwordIsValid = false;
+            this.panel.repaint();
+        }
+
         if(e.getSource() == btn1 ||e.getSource() == btn2 || e.getSource() == btn3 || e.getSource() == btn4 || e.getSource() == btn5 ){
             contPress++;
             String[] nums = ((JButton)e.getSource()).getText().split(" ou ");
@@ -146,8 +159,8 @@ public class PasswordView extends Frame implements ActionListener {
             this.panel.repaint();
             try {
                 System.out.println(nums[0] + " " +nums[1]);
-                this.passwordPass = Facade.getFacadeInstance().verifyPassword(email, contPress, nums[0], nums[1]);
-                System.out.println(passwordPass);
+                this.passwordIsValid = Facade.getFacadeInstance().verifyPassword(email, contPress, nums[0], nums[1]);
+                System.out.println(passwordIsValid);
                 this.numbers = this.generateOrder();
                 this.changeButtons();
                 this.panel.repaint();
@@ -169,9 +182,9 @@ public class PasswordView extends Frame implements ActionListener {
                 }
             } else {
                 try {
-                    if (this.passwordPass) {
-                        System.out.println(" aqui " + passwordPass);
-                        this.passwordPass = false;
+                    if (this.passwordIsValid) {
+                        System.out.println(" aqui " + passwordIsValid);
+                        this.passwordIsValid = false;
                         this.setVisible(false);
                         this.dispose();
                         Facade.getFacadeInstance().makeUserLogged(this.email);

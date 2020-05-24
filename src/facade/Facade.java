@@ -1,10 +1,13 @@
 package facade;
 
+import exceptions.InvalidExtractionCertificateOwnerInfoException;
 import models.User;
 import services.AuthenticationService;
+import services.DigitalCertificateService;
 import views.EmailView;
 
 import java.sql.SQLException;
+import java.util.Map;
 
 public class Facade {
     private static Facade instancia;
@@ -21,6 +24,11 @@ public class Facade {
 
     public static void registerUser(String certificatePath, String group, String password, String passwordConfirmation) throws Exception {
         AuthenticationService.getAuthenticationInstance().registerUser(certificatePath, group, password, passwordConfirmation);
+
+    }
+
+    public static Map<String, String> extractCertificate(String path) throws InvalidExtractionCertificateOwnerInfoException {
+        return DigitalCertificateService.getDigitalCertificateServiceInstance().extractCertificateOwnerInfo(path);
     }
 
     public static boolean checkEmail(String email) throws SQLException {
