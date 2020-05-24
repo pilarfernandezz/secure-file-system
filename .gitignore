@@ -7,4 +7,5 @@ Keys/*
 *.env
 *.key
 *.crt
+*.class
 out/*
