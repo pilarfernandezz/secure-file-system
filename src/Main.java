@@ -16,7 +16,7 @@ public class Main {
 }
 
 //Insert into users (id, email, password, name, user_group, certificate, salt) values ( 2, 'aa',  '1234561010101010' , 'pilar','user', 'certificado','1010101010' );
-//Insert into users (id, email, password, name, user_group, certificate, salt) values ( 1, 'bb',  '1234561010101010' , 'pilar','administrator', 'certificado','1010101010' );
+//Insert into users (id, email, password, name, user_group, certificate, salt) values ( 1, 'bb',  '1234561010101010' , 'pilar','Administrador', 'certificado','1010101010' );
 //Insert into locked_users (id, user_id , isActive) values (2, 1, 1 );
 
 //ajeitar a tela de consulta

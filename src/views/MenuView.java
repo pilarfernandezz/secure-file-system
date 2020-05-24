@@ -102,7 +102,7 @@ public class MenuView extends Frame implements ActionListener {
     public boolean isAdmin() throws SQLException {
         User user = AuthenticationService.getAuthenticationInstance().getLoggedUser();
         System.out.println(user);
-        if(user.getGroup().equals("administrator")) return true;
+        if(user.getGroup().equals("Administrador")) return true;
         return false;
     }
 
