@@ -1,3 +1,4 @@
+
 import facade.Facade;
 
 public class Main {
@@ -15,4 +16,3 @@ public class Main {
 //ajeitar a tela de consulta
 //criptografar a senha e o salt antes de colocar no banco
 //pegar as info do certificado
-
