@@ -21,6 +21,9 @@ public class RegisterView extends Frame implements ActionListener {
     private JLabel lblAlert;
     private JLabel lblTotal;
     private JLabel lblTotalQtd;
+    private static JRadioButton btnadministrator;
+    private static JRadioButton btnuser;
+    private static ButtonGroup btngroup;
     private static JTextField certificatePath = null;
     private static JTextField group = null;
     private static JPasswordField password = null;
@@ -64,10 +67,13 @@ public class RegisterView extends Frame implements ActionListener {
         lblGroup.setBounds(50, 240, 300, 50);
         this.panel.add(lblGroup);
 
-        // TODO TROCAR PARA TOGGLE BUTTON TIPOS ADMINISTRATOR E USUÁRIO
-        group = new JTextField();
-        group.setBounds(250, 250, 500, 30);
-        this.panel.add(group);
+        btnadministrator = new JRadioButton("Administrador");
+        btnadministrator.setBounds(250, 250,150,30);
+        btnuser = new JRadioButton("Usuário");
+        btnuser.setBounds(400, 250,100,30);
+        btngroup = new ButtonGroup();
+        btngroup.add(btnadministrator); btngroup.add(btnuser);
+        this.panel.add(btnuser); this.panel.add(btnadministrator);
 
         lblPassword = new JLabel("Senha númerica:");
         lblPassword.setBounds(50, 290, 300, 50);
@@ -119,7 +125,11 @@ public class RegisterView extends Frame implements ActionListener {
                 this.setVisible(false);
                 this.dispose();
                 try {
-                    RegisterConfirmationView.showScreen(certificatePath.getText(), group.getText(), password.getText(), passwordConfirmation.getText());
+                    if(btnuser.isSelected())
+                        RegisterConfirmationView.showScreen(certificatePath.getText(), "Usuário", password.getText(), passwordConfirmation.getText());
+                    else
+                        RegisterConfirmationView.showScreen(certificatePath.getText(), "Administrador", password.getText(), passwordConfirmation.getText());
+
                 } catch (InvalidExtractionCertificateOwnerInfoException invalidExtractionCertificateOwnerInfoException) {
                     invalidExtractionCertificateOwnerInfoException.printStackTrace();
                 }
