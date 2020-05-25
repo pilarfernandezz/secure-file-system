@@ -94,7 +94,7 @@ public class UserRepository {
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getName());
             ps.setString(4, user.getGroup());
-            ps.setString(5, user.getCertificatePath());
+            ps.setString(5, user.getCertificate());
             ps.setString(6, user.getSalt());
             ps.setInt(7, user.getId());
 
@@ -119,8 +119,9 @@ public class UserRepository {
         String query = "select * from users where email = '" + email + "';";
         ResultSet res = this.conn.createStatement().executeQuery(query);
         if (res.next()) {
-            User user = new User(res.getString("password"), res.getString("password"), res.getString("user_group"), res.getString("certificate"), res.getInt("total_access"), res.getInt("total_consults"));
+            User user = new User(res.getString("password"), res.getString("password"), res.getString("user_group"),null, res.getInt("total_access"), res.getInt("total_consults"));
             user.setEmail(email);
+            user.setCertificate(res.getString("certificate"));
             user.setName(res.getString("name"));
             user.setSalt(res.getString("salt"));
             user.setId(res.getInt("id"));

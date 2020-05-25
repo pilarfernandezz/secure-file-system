@@ -2,7 +2,6 @@
 import exceptions.InvalidCertificateException;
 import exceptions.InvalidExtractionCertificateOwnerInfoException;
 import facade.Facade;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;

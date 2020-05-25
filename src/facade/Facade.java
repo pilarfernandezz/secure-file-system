@@ -6,7 +6,6 @@ import services.AuthenticationService;
 import services.DigitalCertificateService;
 import views.EmailView;
 
-import javax.naming.AuthenticationException;
 import java.sql.SQLException;
 import java.util.Map;
 

@@ -158,12 +158,4 @@ public class RegisterView extends Frame implements ActionListener {
     public void setTotalQtd(int totalQtd) {
         this.totalQtd = totalQtd;
     }
-
-    public void isConsecutive(String password){
-        for (int i = 0; i < password.length();i++){
-            if(password.charAt(i)+1 == password.charAt(i+1)){
-
-            }
-        }
-    }
 }
