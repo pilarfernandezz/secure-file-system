@@ -91,9 +91,9 @@ public class RegisterView extends Frame implements ActionListener {
         passwordConfirmation.setBounds(250, 350, 500, 30);
         this.panel.add(passwordConfirmation);
 
-        lblAlert = new JLabel("Senha deve ter entre 6 e 8 caracteres numéricos");
+        lblAlert = new JLabel("Senha deve ter entre 6 e 8 caracteres numéricos e não pode conter sequências e repetições de caracteres");
         lblAlert.setForeground(Color.red);
-        lblAlert.setBounds(240, 390, 300, 50);
+        lblAlert.setBounds(60, 390, 700, 50);
         this.panel.add(lblAlert);
         lblAlert.setVisible(false);
 
@@ -115,10 +115,21 @@ public class RegisterView extends Frame implements ActionListener {
         this.setVisible(true);
     }
 
+    public boolean validatePassword(String pw){
+        for(int i = 0; i < pw.length()-1;i++){
+            System.out.println(pw.length()-1 + " " + i + " " + pw.charAt(i) + " " + pw.charAt(i+1));
+            if(pw.charAt(i) == pw.charAt(i+1) || pw.charAt(i) == pw.charAt(i+1)+1 || pw.charAt(i) == pw.charAt(i+1)-1) {
+                System.out.println("entrei");
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == btnRegister){
-            if(password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+" )){
+            if(password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+" )|| !this.validatePassword(password.getText())){
                 lblAlert.setVisible(true);
                 this.panel.repaint();
             } else {
