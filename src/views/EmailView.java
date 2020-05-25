@@ -21,7 +21,7 @@ public class EmailView extends Frame implements ActionListener {
     private static JButton btnStart;
     private static JButton btnCancel;
 
-    public EmailView(){
+    public EmailView() throws SQLException {
         super();
 
         this.setBackground(Color.WHITE);
@@ -75,7 +75,7 @@ public class EmailView extends Frame implements ActionListener {
         this.setVisible(true);
     }
 
-    public static void showScreen(){
+    public static void showScreen() throws SQLException {
         new EmailView();
     }
 
@@ -85,12 +85,10 @@ public class EmailView extends Frame implements ActionListener {
             try {
                 if(Facade.getFacadeInstance().checkEmail(this.txtEmail.getText())){
                     if(Facade.getFacadeInstance().verifyIsLocked(this.txtEmail.getText())){
-                        System.out.println("entrei view");
                         lblAlert1.setVisible(true);
                         this.panel.repaint();
                     } else {
                         User user = Facade.findUser(this.txtEmail.getText());
-                        System.out.println(" ddd " + user);
                         this.setVisible(false);
                         this.dispose();
                         PasswordView.showScreen(this.txtEmail.getText());

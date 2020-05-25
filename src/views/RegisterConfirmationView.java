@@ -30,12 +30,11 @@ public class RegisterConfirmationView extends Frame implements ActionListener {
     private JLabel lblSerie;
     private JLabel lblValidUntil;
     private JLabel lblSignType;
-
     private static JButton btnRegister;
     private static JButton btnReturn;
     private int totalQtd =0;
 
-    public RegisterConfirmationView() throws InvalidExtractionCertificateOwnerInfoException {
+    public RegisterConfirmationView() throws InvalidExtractionCertificateOwnerInfoException, SQLException {
         super();
 
         this.certInfo = Facade.getFacadeInstance().extractCertificate(certificatePath);
@@ -52,7 +51,7 @@ public class RegisterConfirmationView extends Frame implements ActionListener {
         lblTotal.setBounds(280, -160, 800, 600);
         this.panel.add(lblTotal);
 
-        lblTotalQtd = new JLabel(String.valueOf(totalQtd));
+        lblTotalQtd = new JLabel(String.valueOf(Facade.getFacadeInstance().getNumberOfUsersRegistered()));
         lblTotalQtd.setBounds(470, -160, 800, 600);
         this.panel.add(lblTotalQtd);
 
@@ -130,15 +129,21 @@ public class RegisterConfirmationView extends Frame implements ActionListener {
                 MenuView.showScreen();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
         } else if(e.getSource() == btnReturn){
             this.setVisible(false);
             this.dispose();
-            RegisterView.showScreen();
+            try {
+                RegisterView.showScreen();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         }
     }
 
-    public static void showScreen(String certificatePath,String group, String password, String passwordConfirmation) throws InvalidExtractionCertificateOwnerInfoException {
+    public static void showScreen(String certificatePath,String group, String password, String passwordConfirmation) throws InvalidExtractionCertificateOwnerInfoException, SQLException {
         RegisterConfirmationView.certificatePath = certificatePath;
         RegisterConfirmationView.group = group;
         RegisterConfirmationView.password = password;

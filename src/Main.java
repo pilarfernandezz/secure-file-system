@@ -2,16 +2,15 @@
 import exceptions.InvalidCertificateException;
 import exceptions.InvalidExtractionCertificateOwnerInfoException;
 import facade.Facade;
-import services.DigitalCertificateService;
 
 import java.io.FileNotFoundException;
+import java.sql.SQLException;
 
 public class Main {
-    public static void main(String args[]) throws FileNotFoundException, InvalidCertificateException, InvalidExtractionCertificateOwnerInfoException {
+    public static void main(String args[]) throws FileNotFoundException, InvalidCertificateException, InvalidExtractionCertificateOwnerInfoException, SQLException {
         Facade.getFacadeInstance().start();
 //        DigitalCertificateService digitalCertificateService = new DigitalCertificateService();
 //        digitalCertificateService.extractCertificateOwnerInfo(digitalCertificateService.loadCertificate("Keys/admin-x509.crt"));
-
     }
 }
 
@@ -24,3 +23,7 @@ public class Main {
 //ajustar grupo para botao
 //informações do cabeçalho nao marretadas
 //adicionar registros de log
+
+//total de acessos do usuário,, incrementar toda vez que o usuário logar no sistema
+//total de usuários do sistema, incrementar toda vez que um novo usuário for cadastrado
+//total de consultas do usuário, incrementar toda vez que o usuário clicar no botao consultas na ConsultView

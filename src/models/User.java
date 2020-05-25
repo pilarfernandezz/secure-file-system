@@ -13,13 +13,17 @@ public class User {
     private String certificatePath;
     private String certificate;
     private boolean allowed;
+    private int totalAccess = 0;
+    private int totalConsults = 0;
 
-    public User(String password, String passwordConfirmation, String group, String certificatePath) {
+    public User(String password, String passwordConfirmation, String group, String certificatePath, int totalAccess, int totalConsults) {
         this.passwordConfirmation = passwordConfirmation;
         this.password = password ;
         this.group = group;
         this.certificatePath = certificatePath;
         this.allowed = true;
+        this.totalAccess = totalAccess;
+        this.totalConsults = totalConsults;
     }
 
     public String getCertificate() {
@@ -86,21 +90,6 @@ public class User {
         this.allowed = allowed;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", passwordConfirmation='" + passwordConfirmation + '\'' +
-                ", name='" + name + '\'' +
-                ", group='" + group + '\'' +
-                ", certificatePath='" + certificatePath + '\'' +
-                ", certificate=" + certificate +
-                ", allowed=" + allowed +
-                '}';
-    }
-
     public String getSalt() {
         return salt;
     }
@@ -115,5 +104,38 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public int getTotalAccess() {
+        return totalAccess;
+    }
+
+    public void setTotalAccess(int totalAccess) {
+        this.totalAccess = totalAccess;
+    }
+
+    public int getTotalConsults() {
+        return totalConsults;
+    }
+
+    public void setTotalConsults(int totalConsults) {
+        this.totalConsults = totalConsults;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", email='" + email + '\'' +
+                ", salt='" + salt + '\'' +
+                ", password='" + password + '\'' +
+                ", passwordConfirmation='" + passwordConfirmation + '\'' +
+                ", name='" + name + '\'' +
+                ", group='" + group + '\'' +
+                ", certificatePath='" + certificatePath + '\'' +
+                ", allowed=" + allowed +
+                ", totalAccess=" + totalAccess +
+                ", totalConsults=" + totalConsults +
+                '}';
     }
 }

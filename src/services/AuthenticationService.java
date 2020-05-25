@@ -6,6 +6,7 @@ import models.LockedUser;
 import models.User;
 import repositories.LockedUserRepository;
 import repositories.UserRepository;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
@@ -21,6 +22,7 @@ public class AuthenticationService {
     private static UserRepository userRepository;
     private static LockedUserRepository lockedUserRepository;
     private static DigitalCertificateService digitalCertificateService;
+    private int totalUsers = 0;
 
     public static AuthenticationService getAuthenticationInstance() throws SQLException {
         userRepository = UserRepository.getUserRepositoryInstance();
@@ -29,6 +31,10 @@ public class AuthenticationService {
         if (instancia == null)
             instancia = new AuthenticationService();
         return instancia;
+    }
+
+    public static int getNumberOfUsersRegistered() throws SQLException {
+        return userRepository.countUsers();
     }
 
     public static void getDataFromCertificate(User user, String path) throws FileNotFoundException, InvalidCertificateException, InvalidExtractionCertificateOwnerInfoException {
@@ -42,8 +48,7 @@ public class AuthenticationService {
         if (this.loggedUser != null) {
             System.out.println("Já existe um usuário logado");
             return false;
-        }
-        else if (email.trim().length() == 0) {
+        } else if (email.trim().length() == 0) {
             System.out.println("Email em branco");
             return false;
         } else {
@@ -53,17 +58,31 @@ public class AuthenticationService {
         }
         return false;
     }
-    public void makeUserLogged(String email) throws SQLException {
-            this.loggedUser= userRepository.getUser(email);
+
+    public void makeUserLogged(String email) throws Exception {
+        this.loggedUser = userRepository.getUser(email);
+        this.loggedUser.setTotalAccess(this.loggedUser.getTotalAccess() + 1);
+        userRepository.updateTotalAccess(this.loggedUser.getId(), this.loggedUser.getTotalAccess());
+        System.out.println(this.loggedUser.getTotalAccess());
+
+        userRepository.updateUser(this.loggedUser);
+    }
+
+    public void updateNumberConsult() throws SQLException {
+        System.out.println(this.loggedUser.getTotalConsults());
+        this.loggedUser.setTotalConsults(this.loggedUser.getTotalConsults()+1);
+        userRepository.updateTotalConsults(this.loggedUser.getId(), this.getLoggedUser().getTotalConsults());
     }
 
     public void registerUser(String certificatePath, String group, String password, String passwordConfirmation) throws Exception {
         String salt = this.saltGenerator();
-        User user = new User(password + salt, passwordConfirmation + salt, group, certificatePath);
+        System.out.println(certificatePath);
+        User user = new User(password + salt, passwordConfirmation + salt, group, certificatePath, 0, 0);
         user.setSalt(salt);
         String errors = this.verifyFields(user);
 
-        AuthenticationService.getDataFromCertificate(user,certificatePath);
+        System.out.println(certificatePath);
+        AuthenticationService.getDataFromCertificate(user, certificatePath);
 
         if (errors != "") {
             throw new Exception(errors);
@@ -72,36 +91,33 @@ public class AuthenticationService {
         if (userRepository.getUser(user.getEmail()) != null) {
             throw new Exception("Usuário " + user.getEmail() + " já existe");
         }
-        System.out.println(user.getPassword() + " " + user.getPasswordConfirmation());
         if (!user.getPassword().equals(user.getPasswordConfirmation())) {
             throw new Exception("Senhas não coincidem");
         }
+
+        this.totalUsers++;
 
         userRepository.createUser(user);
     }
 
     public void updateUser(String certificatePath, String password, String passwordConfirmation) throws Exception {
-        System.out.println(loggedUser);
+        System.out.println("aaaa"+certificatePath);
         this.loggedUser.setCertificatePath(certificatePath);
+        AuthenticationService.getDataFromCertificate(this.loggedUser, certificatePath);
         this.loggedUser.setPassword(password + this.loggedUser.getSalt());
         this.loggedUser.setPasswordConfirmation(passwordConfirmation + this.loggedUser.getSalt());
-        System.out.println(loggedUser);
         String errors = this.verifyFields(this.loggedUser);
         if (errors != "") {
-            System.out.println("1");
             throw new Exception(errors);
         }
 
         if (!this.loggedUser.getPassword().equals(this.loggedUser.getPasswordConfirmation())) {
-            System.out.println("2");
             throw new Exception("Senhas não coincidem");
         }
 
         if (this.loggedUser.getPassword() == null || this.loggedUser.getPasswordConfirmation() == null || this.loggedUser.getCertificatePath() == null) {
-            System.out.println("3");
             throw new Exception("Campos em branco");
         }
-        System.out.println("4");
         userRepository.updateUser(this.loggedUser);
     }
 
@@ -132,10 +148,10 @@ public class AuthenticationService {
         LocalDateTime localDateTime = LocalDateTime.now();
         LockedUser lockedUser = LockedUserRepository.getLockedUserRepositoryInstance().getLockedUser(email);
 
-        if(lockedUser != null) {
+        if (lockedUser != null) {
             LocalDateTime lockDate = lockedUser.getLockDate();
             System.out.println(localDateTime.toString() + " " + lockDate.toString());
-            if(LocalDateTime.parse(LocalDateTime.now().toString()).minusMinutes(2).compareTo(lockedUser.getLockDate()) < 0){
+            if (LocalDateTime.parse(LocalDateTime.now().toString()).minusMinutes(2).compareTo(lockedUser.getLockDate()) < 0) {
                 return true;
             } else {
                 this.unlockUser(email);
@@ -188,9 +204,10 @@ public class AuthenticationService {
     }
 
     public boolean verifyPassword(String email, int cont, String n1, String n2) throws SQLException {
-       User user= userRepository.getUser(email);
-       String pw = user.getPassword().substring(0,user.getPassword().length()-10);
-       if(cont <= pw.length() && (pw.substring(cont-1, cont).equals(n1) || pw.substring(cont-1, cont).equals(n2))) return true;
-       return false;
+        User user = userRepository.getUser(email);
+        String pw = user.getPassword().substring(0, user.getPassword().length() - 10);
+        if (cont <= pw.length() && (pw.substring(cont - 1, cont).equals(n1) || pw.substring(cont - 1, cont).equals(n2)))
+            return true;
+        return false;
     }
 }

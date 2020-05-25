@@ -1,5 +1,6 @@
 package views;
 
+import facade.Facade;
 import models.User;
 import services.AuthenticationService;
 
@@ -22,7 +23,7 @@ public class MenuView extends Frame implements ActionListener {
     private static JButton btnExit;
     private int totalQtd = 0;
 
-    public MenuView() throws SQLException {
+    public MenuView() throws Exception {
         super();
 
         this.setBackground(Color.WHITE);
@@ -33,13 +34,9 @@ public class MenuView extends Frame implements ActionListener {
         this.panel.setBounds(0, 0, 800, 600);
         this.panel.add(lblTitle);
 
-        lblTotal = new JLabel("Total de acessos do usuário:");
+        lblTotal = new JLabel("Total de acessos do usuário: " + Facade.getFacadeInstance().getLoggedUser().getTotalAccess());
         lblTotal.setBounds(280, -160, 800, 600);
         this.panel.add(lblTotal);
-
-        lblTotalQtd = new JLabel(String.valueOf(totalQtd));
-        lblTotalQtd.setBounds(465, -160, 800, 600);
-        this.panel.add(lblTotalQtd);
 
         lblText = new JLabel("Menu principal:");
         lblText.setBounds(350, -120, 800, 600);
@@ -80,20 +77,36 @@ public class MenuView extends Frame implements ActionListener {
         if(e.getSource() == btnRegister){
 			this.setVisible(false);
 			this.dispose();
-			RegisterView.showScreen();
-		} else if (e.getSource() == btnChange){
+            try {
+                RegisterView.showScreen();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        } else if (e.getSource() == btnChange){
             this.setVisible(false);
             this.dispose();
-            ChangePwView.showScreen();
+            try {
+                ChangePwView.showScreen();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         } else if (e.getSource() == btnConsult){
             this.setVisible(false);
             this.dispose();
-            ConsultView.showScreen();
+            try {
+                ConsultView.showScreen();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
             // TODO ADICIONAR CHAMADA DE TELA DE CONSULTA E DESCOMENTAR CODIGO ACIMA
         } else if (e.getSource() == btnExit){
             this.setVisible(false);
             this.dispose();
-            ExitView.showScreen();
+            try {
+                ExitView.showScreen();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         } else {
             System.exit(1);
         }
@@ -101,12 +114,11 @@ public class MenuView extends Frame implements ActionListener {
 
     public boolean isAdmin() throws SQLException {
         User user = AuthenticationService.getAuthenticationInstance().getLoggedUser();
-        System.out.println(user);
         if(user.getGroup().equals("Administrador")) return true;
         return false;
     }
 
-    public static void showScreen() throws SQLException {
+    public static void showScreen() throws Exception {
         new MenuView();
     }
 
