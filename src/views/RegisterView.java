@@ -32,7 +32,7 @@ public class RegisterView extends Frame implements ActionListener {
     private static JButton btnReturn;
     private int totalQtd =0;
 
-    public RegisterView(){
+    public RegisterView() throws SQLException {
         super();
 
         this.setBackground(Color.WHITE);
@@ -47,7 +47,7 @@ public class RegisterView extends Frame implements ActionListener {
         lblTotal.setBounds(280, -160, 800, 600);
         this.panel.add(lblTotal);
 
-        lblTotalQtd = new JLabel(String.valueOf(totalQtd));
+        lblTotalQtd = new JLabel(String.valueOf(Facade.getFacadeInstance().getNumberOfUsersRegistered()));
         lblTotalQtd.setBounds(470, -160, 800, 600);
         this.panel.add(lblTotalQtd);
 
@@ -118,7 +118,7 @@ public class RegisterView extends Frame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == btnRegister){
-            if(password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+")){
+            if(password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+" )){
                 lblAlert.setVisible(true);
                 this.panel.repaint();
             } else {
@@ -130,7 +130,7 @@ public class RegisterView extends Frame implements ActionListener {
                     else
                         RegisterConfirmationView.showScreen(certificatePath.getText(), "Administrador", password.getText(), passwordConfirmation.getText());
 
-                } catch (InvalidExtractionCertificateOwnerInfoException invalidExtractionCertificateOwnerInfoException) {
+                } catch (InvalidExtractionCertificateOwnerInfoException | SQLException invalidExtractionCertificateOwnerInfoException) {
                     invalidExtractionCertificateOwnerInfoException.printStackTrace();
                 }
             }
@@ -141,11 +141,13 @@ public class RegisterView extends Frame implements ActionListener {
                 MenuView.showScreen();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
         }
     }
 
-    public static void showScreen(){
+    public static void showScreen() throws SQLException {
         new RegisterView();
     }
 
@@ -155,5 +157,13 @@ public class RegisterView extends Frame implements ActionListener {
 
     public void setTotalQtd(int totalQtd) {
         this.totalQtd = totalQtd;
+    }
+
+    public void isConsecutive(String password){
+        for (int i = 0; i < password.length();i++){
+            if(password.charAt(i)+1 == password.charAt(i+1)){
+
+            }
+        }
     }
 }

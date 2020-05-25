@@ -25,7 +25,7 @@ public class ChangePwView extends Frame implements ActionListener {
     private static JButton btnReturn;
     private int totalQtd = 0;
 
-    public ChangePwView(){
+    public ChangePwView() throws SQLException {
         super();
 
         this.setBackground(Color.WHITE);
@@ -104,6 +104,8 @@ public class ChangePwView extends Frame implements ActionListener {
                 MenuView.showScreen();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
 
         } else if(e.getSource() == btnReturn) {
@@ -111,13 +113,13 @@ public class ChangePwView extends Frame implements ActionListener {
             this.dispose();
             try {
                 MenuView.showScreen();
-            } catch (SQLException throwables) {
+            } catch (Exception throwables) {
                 throwables.printStackTrace();
             }
         }
     }
 
-    public static void showScreen(){
+    public static void showScreen() throws SQLException {
         new ChangePwView();
     }
 

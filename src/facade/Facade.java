@@ -6,6 +6,7 @@ import services.AuthenticationService;
 import services.DigitalCertificateService;
 import views.EmailView;
 
+import javax.naming.AuthenticationException;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -18,8 +19,16 @@ public class Facade {
         return instancia;
     }
 
-    public static void start(){
+    public static void start() throws SQLException {
         new EmailView();
+    }
+
+    public static int getNumberOfUsersRegistered() throws SQLException {
+       return AuthenticationService.getAuthenticationInstance().getNumberOfUsersRegistered();
+    }
+
+    public static void updateConsultNumber() throws SQLException {
+        AuthenticationService.getAuthenticationInstance().updateNumberConsult();
     }
 
     public static void registerUser(String certificatePath, String group, String password, String passwordConfirmation) throws Exception {
@@ -29,6 +38,10 @@ public class Facade {
 
     public static Map<String, String> extractCertificate(String path) throws InvalidExtractionCertificateOwnerInfoException {
         return DigitalCertificateService.getDigitalCertificateServiceInstance().extractCertificateOwnerInfo(path);
+    }
+
+    public static User getLoggedUser() throws SQLException {
+        return AuthenticationService.getAuthenticationInstance().getLoggedUser();
     }
 
     public static boolean checkEmail(String email) throws SQLException {
@@ -55,7 +68,7 @@ public class Facade {
         return AuthenticationService.getAuthenticationInstance().verifyPassword(email,cont, n1,n2);
     }
 
-    public static void makeUserLogged(String email) throws SQLException {
+    public static void makeUserLogged(String email) throws Exception {
         AuthenticationService.getAuthenticationInstance().makeUserLogged(email);
     }
 }

@@ -33,7 +33,7 @@ public class PasswordView extends Frame implements ActionListener {
     private int contPress = 0;
     private boolean passwordIsValid = false;
 
-    public PasswordView(){
+    public PasswordView() throws SQLException {
         super();
 
         this.setBackground(Color.WHITE);
@@ -91,7 +91,7 @@ public class PasswordView extends Frame implements ActionListener {
 
         lblAlert = new JLabel("Senha incorreta.");
         lblAlert.setForeground(Color.red);
-        lblAlert.setBounds(320, 200, 200, 50);
+        lblAlert.setBounds(320, 330, 200, 50);
         this.panel.add(lblAlert);
         lblAlert.setVisible(false);
 
@@ -114,7 +114,7 @@ public class PasswordView extends Frame implements ActionListener {
         this.setVisible(true);
     }
 
-    public static void showScreen(String email){
+    public static void showScreen(String email) throws SQLException {
         PasswordView.email = email;
         new PasswordView();
     }
@@ -158,9 +158,7 @@ public class PasswordView extends Frame implements ActionListener {
             passPassword.setText(passPassword.getText() + "*");
             this.panel.repaint();
             try {
-                System.out.println(nums[0] + " " +nums[1]);
                 this.passwordIsValid = Facade.getFacadeInstance().verifyPassword(email, contPress, nums[0], nums[1]);
-                System.out.println(passwordIsValid);
                 this.numbers = this.generateOrder();
                 this.changeButtons();
                 this.panel.repaint();
@@ -183,7 +181,6 @@ public class PasswordView extends Frame implements ActionListener {
             } else {
                 try {
                     if (this.passwordIsValid) {
-                        System.out.println(" aqui " + passwordIsValid);
                         this.passwordIsValid = false;
                         this.setVisible(false);
                         this.dispose();
@@ -196,6 +193,8 @@ public class PasswordView extends Frame implements ActionListener {
                     }
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
+                } catch (Exception exception) {
+                    exception.printStackTrace();
                 }
             }
         } else if(e.getSource() == btnCancel){

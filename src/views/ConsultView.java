@@ -1,5 +1,7 @@
 package views;
 
+import facade.Facade;
+
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicDirectoryModel;
 import java.awt.*;
@@ -17,12 +19,14 @@ public class ConsultView extends Frame implements ActionListener {
     private JLabel lblTotalQtd;
     private JList jList;
     private static JButton btnReturn;
+    private static JButton btnConsult;
+
     private BasicDirectoryModel basicDirectoryModel;
     private JFileChooser jFileChooser;
     private JTable jTable;
     private int totalQtd = 0;
 
-    public ConsultView() {
+    public ConsultView() throws SQLException {
         super();
 
         this.setBackground(Color.WHITE);
@@ -33,13 +37,9 @@ public class ConsultView extends Frame implements ActionListener {
         this.panel.setBounds(0, 0, 800, 600);
         this.panel.add(lblTitle);
 
-        lblTotal = new JLabel("Total de consultas do usuário:");
+        lblTotal = new JLabel("Total de consultas do usuário: " + Facade.getLoggedUser().getTotalConsults());
         lblTotal.setBounds(280, -160, 800, 600);
         this.panel.add(lblTotal);
-
-        lblTotalQtd = new JLabel(String.valueOf(totalQtd));
-        lblTotalQtd.setBounds(475, -160, 800, 600);
-        this.panel.add(lblTotalQtd);
 
         lblText = new JLabel(" Consultar Pasta de Arquivos Secretos:");
         lblText.setBounds(250, -120, 800, 600);
@@ -64,6 +64,11 @@ public class ConsultView extends Frame implements ActionListener {
         this.panel.add(btnReturn);
         btnReturn.addActionListener(this);
 
+        btnConsult = new JButton("Consultar");
+        btnConsult.setBounds(100, 450, 100, 40);
+        this.panel.add(btnConsult);
+        btnConsult.addActionListener(this);
+
         this.panel.setLayout(null);
         this.panel.setVisible(true);
         this.panel.setBackground(Color.WHITE);
@@ -75,18 +80,29 @@ public class ConsultView extends Frame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == btnReturn){
+        if(e.getSource() == btnConsult){
+            try {
+                Facade.getFacadeInstance().updateConsultNumber();
+                this.panel.repaint();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+
+        else if(e.getSource() == btnReturn){
             this.setVisible(false);
             this.dispose();
             try {
                 MenuView.showScreen();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
         }
     }
 
-    public static void showScreen(){
+    public static void showScreen() throws SQLException {
         new ConsultView();
     }
 

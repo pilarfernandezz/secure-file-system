@@ -18,7 +18,7 @@ public class ExitView extends Frame implements ActionListener {
     private static JButton btnReturn;
     private int totalQtd = 0;
 
-    public ExitView(){
+    public ExitView() throws SQLException {
         super();
 
         this.setBackground(Color.WHITE);
@@ -73,11 +73,13 @@ public class ExitView extends Frame implements ActionListener {
                 MenuView.showScreen();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
         }
     }
 
-    public static void showScreen(){
+    public static void showScreen() throws SQLException {
         new ExitView();
     }
 

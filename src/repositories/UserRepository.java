@@ -18,6 +18,53 @@ public class UserRepository {
         this.conn = DriverManager.getConnection("jdbc:mysql://root@localhost/secure_file_system");
     }
 
+    public int countUsers() throws SQLException {
+        try{
+            String query = "select count(*) from users;";
+            ResultSet res = this.conn.createStatement().executeQuery(query);
+            if (res.next()) {
+                return res.getInt("count(*)");
+            }
+
+            return 0;
+        } catch (Exception e){
+            throw e;
+        }
+    }
+
+    public int getTotalAccess(int id) throws SQLException {
+        String query = "select total_access from users where id = " + id + ";";
+        ResultSet res = this.conn.createStatement().executeQuery(query);
+        if (res.next()) {
+            return res.getInt("total_access");
+        }
+        return 0;
+    }
+
+    public void updateTotalAccess(int id, int totalAccess) throws SQLException {
+        try {
+            String query = "update users set total_access = ? where id = ?;";
+            PreparedStatement ps = this.conn.prepareStatement(query);
+            ps.setInt(1, totalAccess);
+            ps.setInt(2, id);
+            ps.execute();
+        } catch(Exception e){
+            throw e;
+        }
+    }
+
+    public void updateTotalConsults(int id, int totalConsults) throws SQLException {
+        try {
+            String query = "update users set total_consults = ? where id = ?;";
+            PreparedStatement ps = this.conn.prepareStatement(query);
+            ps.setInt(1, totalConsults);
+            ps.setInt(2, id);
+            ps.execute();
+        } catch(Exception e){
+            throw e;
+        }
+    }
+
     public void createUser(User user) {
         try {
             String query = "insert into users (id,email,password,name,user_group, certificate,salt) values(?,?,?,?,?,?,?);";
@@ -39,14 +86,17 @@ public class UserRepository {
 
     public void updateUser(User user) throws Exception {
         try {
-            String query = "update users set email = ?, password = ?, name = ?, user_group = ?, certificate = ? where id = ?";
+
+            System.out.println("------- " + user.getCertificate());
+            String query = "update users set email = ?, password = ?, name = ?, user_group = ?, certificate = ?, salt = ? where id = ?";
             PreparedStatement ps = this.conn.prepareStatement(query);
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getName());
             ps.setString(4, user.getGroup());
             ps.setString(5, user.getCertificatePath());
-            ps.setInt(6, user.getId());
+            ps.setString(6, user.getSalt());
+            ps.setInt(7, user.getId());
 
             ps.execute();
             System.out.println("Usuário atualizado com sucesso");
@@ -69,7 +119,9 @@ public class UserRepository {
         String query = "select * from users where email = '" + email + "';";
         ResultSet res = this.conn.createStatement().executeQuery(query);
         if (res.next()) {
-            User user = new User(res.getString("password"), res.getString("password"), res.getString("user_group"), res.getString("certificate"));
+            User user = new User(res.getString("password"), res.getString("password"), res.getString("user_group"), res.getString("certificate"), res.getInt("total_access"), res.getInt("total_consults"));
+            user.setEmail(email);
+            user.setName(res.getString("name"));
             user.setSalt(res.getString("salt"));
             user.setId(res.getInt("id"));
             return user;
