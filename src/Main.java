@@ -1,16 +1,25 @@
-
-import exceptions.InvalidCertificateException;
-import exceptions.InvalidExtractionCertificateOwnerInfoException;
 import facade.Facade;
+import services.IndexService;
 
-import java.io.FileNotFoundException;
-import java.sql.SQLException;
+import javax.crypto.NoSuchPaddingException;
+import java.security.NoSuchAlgorithmException;
 
 public class Main {
-    public static void main(String args[]) throws FileNotFoundException, InvalidCertificateException, InvalidExtractionCertificateOwnerInfoException, SQLException {
-        Facade.getFacadeInstance().start();
-//        DigitalCertificateService digitalCertificateService = new DigitalCertificateService();
-//        digitalCertificateService.extractCertificateOwnerInfo(digitalCertificateService.loadCertificate("Keys/admin-x509.crt"));
+
+    private static Facade facade;
+
+    public static void main(String args[]) throws Exception {
+        setupAllBeforeStart();
+
+        facade.start();
+
+        byte[] index = facade.decryptFile("Keys/", "Files/", "user01", "index", false, null);
+        byte[] file1 = facade.decryptFile("Keys/", "Files/", "user01", "XXYYZZ11", true, IndexService.getInstance().getIndexInfo(index).get("XXYYZZ11"));
+        byte[] file2 = facade.decryptFile("Keys/", "Files/", "user01", "XXYYZZ22", true, IndexService.getInstance().getIndexInfo(index).get("XXYYZZ22"));
+    }
+
+    private static void setupAllBeforeStart() throws NoSuchPaddingException, NoSuchAlgorithmException {
+        facade = Facade.getFacadeInstance();
     }
 }
 

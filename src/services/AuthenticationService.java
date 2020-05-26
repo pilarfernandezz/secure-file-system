@@ -6,7 +6,6 @@ import models.LockedUser;
 import models.User;
 import repositories.LockedUserRepository;
 import repositories.UserRepository;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
@@ -27,7 +26,7 @@ public class AuthenticationService {
     public static AuthenticationService getAuthenticationInstance() throws SQLException {
         userRepository = UserRepository.getUserRepositoryInstance();
         lockedUserRepository = LockedUserRepository.getLockedUserRepositoryInstance();
-        digitalCertificateService = DigitalCertificateService.getDigitalCertificateServiceInstance();
+        digitalCertificateService = DigitalCertificateService.getInstance();
         if (instancia == null)
             instancia = new AuthenticationService();
         return instancia;
@@ -70,7 +69,7 @@ public class AuthenticationService {
 
     public void updateNumberConsult() throws SQLException {
         System.out.println(this.loggedUser.getTotalConsults());
-        this.loggedUser.setTotalConsults(this.loggedUser.getTotalConsults()+1);
+        this.loggedUser.setTotalConsults(this.loggedUser.getTotalConsults() + 1);
         userRepository.updateTotalConsults(this.loggedUser.getId(), this.getLoggedUser().getTotalConsults());
     }
 
@@ -101,7 +100,7 @@ public class AuthenticationService {
     }
 
     public void updateUser(String certificatePath, String password, String passwordConfirmation) throws Exception {
-        System.out.println("aaaa"+certificatePath);
+        System.out.println("aaaa" + certificatePath);
         this.loggedUser.setCertificatePath(certificatePath);
         AuthenticationService.getDataFromCertificate(this.loggedUser, certificatePath);
         this.loggedUser.setPassword(password + this.loggedUser.getSalt());
