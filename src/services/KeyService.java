@@ -17,6 +17,15 @@ import java.util.Base64;
 
 public class KeyService {
 
+    private static KeyService instance;
+
+    public static KeyService getInstance() {
+        if (instance == null) {
+            instance = new KeyService();
+        }
+        return instance;
+    }
+
     // recebe o caminho do arquivo que contem o certificado digital que
     // contem a chave publica, gera um objeto PublicKey e o retorna
     public PublicKey loadPublicKey(X509Certificate cert) throws CertificateException, FileNotFoundException {
