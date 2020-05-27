@@ -2,13 +2,15 @@
 import exceptions.InvalidCertificateException;
 import exceptions.InvalidExtractionCertificateOwnerInfoException;
 import facade.Facade;
+import views.ConsultView;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 
 public class Main {
     public static void main(String args[]) throws FileNotFoundException, InvalidCertificateException, InvalidExtractionCertificateOwnerInfoException, SQLException {
-        Facade.getFacadeInstance().start();
+       new ConsultView();
+        // Facade.getFacadeInstance().start();
 //        DigitalCertificateService digitalCertificateService = new DigitalCertificateService();
 //        digitalCertificateService.extractCertificateOwnerInfo(digitalCertificateService.loadCertificate("Keys/admin-x509.crt"));
     }

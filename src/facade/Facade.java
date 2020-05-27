@@ -70,4 +70,9 @@ public class Facade {
     public static void makeUserLogged(String email) throws Exception {
         AuthenticationService.getAuthenticationInstance().makeUserLogged(email);
     }
+
+    public static int getRowSize(){
+        return 3;
+        //TODO DESMARRETAR
+    }
 }
