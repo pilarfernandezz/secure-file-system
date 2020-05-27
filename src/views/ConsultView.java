@@ -10,7 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.SQLException;
 
-public class ConsultView extends Frame implements ActionListener, MouseListener {
+public class ConsultView extends FrameConsult implements ActionListener, MouseListener {
     private static ConsultView instance;
     private Font titleFont = new Font("Monospaced", Font.BOLD, 30);
     private JLabel lblTitle;
@@ -35,9 +35,9 @@ public class ConsultView extends Frame implements ActionListener, MouseListener 
         lblTitle.setBounds(580, 40, 1600, 100);
         lblTitle.setFont(titleFont);
         this.panel.add(lblTitle);
-
-        lblTotal = new JLabel("Total de consultas do usuário: " + Facade.getLoggedUser().getTotalConsults());
-        lblTotal.setBounds(280, -160, 800, 600);
+///+ Facade.getLoggedUser().getTotalConsults()
+        lblTotal = new JLabel("Total de consultas do usuário: 0 " );
+        lblTotal.setBounds(700, -170, 800, 600);
         this.panel.add(lblTotal);
 
         lblText = new JLabel(" Consultar Pasta de Arquivos Secretos:");

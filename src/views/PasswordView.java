@@ -44,7 +44,7 @@ public class PasswordView extends Frame implements ActionListener {
         this.panel.setBounds(0, 0, 800, 600);
         this.panel.add(lblTitle);
 
-        lblText = new JLabel("Digite seu login:");
+        lblText = new JLabel("Digite sua senha:");
         lblText.setBounds(340, 100, 200, 50);
         this.panel.add(lblText);
 
@@ -95,7 +95,7 @@ public class PasswordView extends Frame implements ActionListener {
         this.panel.add(lblAlert);
         lblAlert.setVisible(false);
 
-        btnStart = new JButton("Entrar");
+        btnStart = new JButton("Seguir");
         btnStart.setBounds(280, 400, 100, 40);
         this.panel.add(btnStart);
         btnStart.addActionListener(this);
@@ -185,7 +185,7 @@ public class PasswordView extends Frame implements ActionListener {
                         this.setVisible(false);
                         this.dispose();
                         Facade.getFacadeInstance().makeUserLogged(this.email);
-                        MenuView.showScreen();
+                        PvtKeyView.showScreen();
                     } else {
                         this.passwordErrors++;
                         lblAlert.setVisible(true);
