@@ -1,4 +1,5 @@
 import facade.Facade;
+import views.ConsultView;
 
 import javax.crypto.NoSuchPaddingException;
 import java.security.NoSuchAlgorithmException;
@@ -11,8 +12,8 @@ public class Main {
     public static void main(String args[]) throws Exception {
         setupAllBeforeStart();
 
-        //facade.start();
-
+        facade.start();
+         //   new ConsultView();
 //        byte[] index = facade.decryptFile("Keys/", "Files/", "user01", "index", false, null);
 //        byte[] file1 = facade.decryptFile("Keys/", "Files/", "user01", "XXYYZZ11", true, IndexService.getInstance().getIndexInfo(index).get("XXYYZZ11"));
 //        byte[] file2 = facade.decryptFile("Keys/", "Files/", "user01", "XXYYZZ22", true, IndexService.getInstance().getIndexInfo(index).get("XXYYZZ22"));

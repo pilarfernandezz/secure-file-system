@@ -5,8 +5,10 @@ import models.User;
 import services.AuthenticationService;
 import services.CipherService;
 import services.DigitalCertificateService;
+import services.IndexService;
 import views.EmailView;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -80,6 +82,11 @@ public class Facade {
     public static byte[] decryptFile(String keysRootPath, String fileRootPath, String userName, String fileName, boolean save, String newFileName) throws Exception {
         CipherService.getInstance().setKeysRootPath(keysRootPath);
         CipherService.getInstance().setFileRootPath(fileRootPath);
+        System.out.println(keysRootPath + " " + fileRootPath);
         return CipherService.getInstance().decryptFileContent(userName, fileName, save, newFileName);
+    }
+
+    public static Map<String,String> getIndexInfo(byte[] index) throws UnsupportedEncodingException {
+        return IndexService.getInstance().getIndexInfo(index);
     }
 }

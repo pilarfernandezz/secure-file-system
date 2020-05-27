@@ -68,6 +68,7 @@ public class UserRepository {
     public void createUser(User user) {
         try {
             String query = "insert into users (id,email,password,name,user_group, certificate,salt) values(?,?,?,?,?,?,?);";
+            System.out.println(user.getCertificate());
             PreparedStatement ps = this.conn.prepareStatement(query);
             ps.setInt(1, this.getNextId());
             ps.setString(2, user.getEmail());

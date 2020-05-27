@@ -36,11 +36,13 @@ public class AuthenticationService {
         return userRepository.countUsers();
     }
 
-    public static void getDataFromCertificate(User user, String path) throws FileNotFoundException, InvalidCertificateException, InvalidExtractionCertificateOwnerInfoException {
+    public static User getDataFromCertificate(User user, String path) throws FileNotFoundException, InvalidCertificateException, InvalidExtractionCertificateOwnerInfoException {
         Map<String, String> data = digitalCertificateService.extractCertificateOwnerInfo(path);
         user.setName(data.get("CN"));
         user.setEmail(data.get("EMAILADDRESS"));
         user.setCertificate(data.get("CERTIFICATE"));
+
+        return user;
     }
 
     public boolean checkEmail(String email) throws SQLException {
@@ -80,9 +82,8 @@ public class AuthenticationService {
         user.setSalt(salt);
         String errors = this.verifyFields(user);
 
-        System.out.println(certificatePath);
-        AuthenticationService.getDataFromCertificate(user, certificatePath);
-
+        user = AuthenticationService.getDataFromCertificate(user, certificatePath);
+        System.out.println(" authenticationservice" + user.getCertificate());
         if (errors != "") {
             throw new Exception(errors);
         }
@@ -102,7 +103,7 @@ public class AuthenticationService {
     public void updateUser(String certificatePath, String password, String passwordConfirmation) throws Exception {
         System.out.println("aaaa" + certificatePath);
         this.loggedUser.setCertificatePath(certificatePath);
-        AuthenticationService.getDataFromCertificate(this.loggedUser, certificatePath);
+        this.loggedUser = AuthenticationService.getDataFromCertificate(this.loggedUser, certificatePath);
         this.loggedUser.setPassword(password + this.loggedUser.getSalt());
         this.loggedUser.setPasswordConfirmation(passwordConfirmation + this.loggedUser.getSalt());
         String errors = this.verifyFields(this.loggedUser);

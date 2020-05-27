@@ -3,16 +3,12 @@ package views;
 import facade.Facade;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.plaf.basic.BasicDirectoryModel;
-import javax.xml.soap.Text;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.sql.SQLException;
-import java.util.jar.JarEntry;
 
 public class ConsultView extends Frame implements ActionListener, MouseListener {
     private static ConsultView instance;
@@ -21,16 +17,14 @@ public class ConsultView extends Frame implements ActionListener, MouseListener 
     private JLabel lblText;
     private JLabel lblTotal;
     private JLabel lblTotalQtd;
-    private JList jList;
-    private JLabel lblpath;
+    private JLabel lblAlert;
     private JTextField txtpath;
     private static JButton btnReturn;
     private static JButton btnConsult;
-    private JScrollPane scrollPane;
-    private JTable jTable;
     private int totalQtd = 0;
     private JLabel[][] table;
     private TableView tableView;
+    private byte[] folderContent;
 
     public ConsultView() throws SQLException {
         super();
@@ -42,9 +36,9 @@ public class ConsultView extends Frame implements ActionListener, MouseListener 
         lblTitle.setFont(titleFont);
         this.panel.add(lblTitle);
 
-//        lblTotal = new JLabel("Total de consultas do usuário: " + Facade.getLoggedUser().getTotalConsults());
-//        lblTotal.setBounds(280, -160, 800, 600);
-//        this.panel.add(lblTotal);
+        lblTotal = new JLabel("Total de consultas do usuário: " + Facade.getLoggedUser().getTotalConsults());
+        lblTotal.setBounds(280, -160, 800, 600);
+        this.panel.add(lblTotal);
 
         lblText = new JLabel(" Consultar Pasta de Arquivos Secretos:");
         lblText.setBounds(680, 150, 1600, 30);
@@ -53,6 +47,12 @@ public class ConsultView extends Frame implements ActionListener, MouseListener 
         lblText = new JLabel("Caminho da pasta:");
         lblText.setBounds(30, 180, 300, 50);
         this.panel.add(lblText);
+
+        lblAlert = new JLabel("Caminho inválido");
+        lblAlert.setBounds(740, 220, 1600, 30);
+        lblAlert.setForeground(Color.red);
+        this.panel.add(lblAlert);
+        lblAlert.setVisible(false);
 
         txtpath = new JTextField();
         txtpath.setBounds(150, 190, 1300, 30);
@@ -64,8 +64,7 @@ public class ConsultView extends Frame implements ActionListener, MouseListener 
         btnConsult.addActionListener(this);
 
         this.tableView = new TableView();
-        this.tableView.setBounds(10, 230, 1580,630);
-        this.panel.add(tableView);
+        this.tableView.setBounds(10, 230, 1580, 630);
 
         btnReturn = new JButton("Voltar");
         btnReturn.setBounds(750, 885, 100, 20);
@@ -77,7 +76,7 @@ public class ConsultView extends Frame implements ActionListener, MouseListener 
         this.panel.setBackground(Color.WHITE);
         this.getContentPane().add(panel);
 
-        //this.showHeader();
+        this.showHeader();
         this.setVisible(true);
     }
 
@@ -85,32 +84,23 @@ public class ConsultView extends Frame implements ActionListener, MouseListener 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnConsult) {
             try {
-                //Facade.getFacadeInstance().updateConsultNumber();
+                Facade.getFacadeInstance().updateConsultNumber();
+                if(txtpath.getText()!= null && txtpath.getText().trim().length()>0){
+                    String rootPath = txtpath.getText().substring(0,txtpath.getText().lastIndexOf("/")+1);
 
-                this.table = new JLabel[Facade.getFacadeInstance().getRowSize() + 1][4];
-                //Definindo as colunas
-                this.table[0][0] = new JLabel("Nome do arquivo");
-                this.table[0][1] = new JLabel("Dono");
-                this.table[0][2] = new JLabel("Grupo");
-                this.table[0][3] = new JLabel("Status");
-
-                int x = 10, y = 240;
-                for(int i = 0; i < Facade.getFacadeInstance().getRowSize();i++){
-                    for(int j = 0 ; j < 4 ; j++){
-                        if(i != 0){ //Adiciona informações dos arquivos na tabela
-                            this.table[i][j] = new JLabel("texto");
-                        }
-                        this.table[i][j].setBounds(x, y, 195,20);
-                        x+=200;
-
-                        this.panel.add( this.table[i][j]);
-                    }
-                    y+=23;
-
+                    this.folderContent = Facade.getFacadeInstance().decryptFile("Keys/",rootPath, Facade.getFacadeInstance().getLoggedUser().getName(),txtpath.getText().substring(txtpath.getText().lastIndexOf("/")+2), false,null);
+                    this.panel.add(tableView);
+                    this.panel.repaint();
+                } else {
+                    this.lblAlert.setVisible(true);
+                    this.panel.repaint();
                 }
-                this.panel.repaint();
             } catch (Exception exc) {
-                throw exc;
+                try {
+                    throw exc;
+                } catch (Exception exception) {
+                    exception.printStackTrace();
+                }
             }
         } else if (e.getSource() == btnReturn) {
             this.setVisible(false);

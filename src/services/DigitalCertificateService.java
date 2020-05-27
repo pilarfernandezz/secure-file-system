@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DigitalCertificateService {
-    private String certificateHex;
 
     private static DigitalCertificateService instance;
 
@@ -29,6 +28,7 @@ public class DigitalCertificateService {
     // digital e retorna o seu conteudo como objeto X509Certificate
     public X509Certificate loadCertificate(String path) throws FileNotFoundException, InvalidCertificateException {
         try {
+            System.out.println(" load certificate " + path);
             return (X509Certificate) CertificateFactory.getInstance("X509")
                     .generateCertificate(new FileInputStream(new File(path)));
         } catch (CertificateException | IOException e) {
@@ -60,7 +60,8 @@ public class DigitalCertificateService {
                     ownerInfo.put("ISSUER", issuerInfoSplitedArray[1]);
                 }
             }
-            ownerInfo.put("CERTIFICATE", this.certificateHex);
+
+            ownerInfo.put("CERTIFICATE",  this.getCertificate(path));
 
             return ownerInfo;
         } catch (Exception e) {
@@ -75,7 +76,7 @@ public class DigitalCertificateService {
         }
     }
 
-    private void getCertificate(String path) throws IOException {
+    private String getCertificate(String path) throws IOException {
         File file = new File(path);
         String textAll = "";
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
@@ -88,7 +89,7 @@ public class DigitalCertificateService {
             }
 
             String[] text = textAll.split("-----BEGIN CERTIFICATE-----");
-            this.certificateHex = text[1].replace("-----END CERTIFICATE-----", "");
+            return text[1].replace("-----END CERTIFICATE-----", "");
         } catch (Exception e) {
             throw e;
         }
