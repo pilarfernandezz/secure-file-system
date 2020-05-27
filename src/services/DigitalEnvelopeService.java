@@ -16,6 +16,14 @@ import java.security.PrivateKey;
 
 public class DigitalEnvelopeService {
 
+    private static DigitalEnvelopeService instance;
+
+    public static DigitalEnvelopeService getInstance() {
+        if (instance == null)
+            instance = new DigitalEnvelopeService();
+        return instance;
+    }
+
     // recebe o caminho de um arquivo contendo um certificado
     // digital e retorna o seu conteudo como objeto
     public byte[] loadDigitalEnvelope(PrivateKey privateKey, String path) throws NoSuchAlgorithmException, IOException, InvalidKeyException, InvalidDigitalEnvelopeException {

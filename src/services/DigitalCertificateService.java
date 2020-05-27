@@ -1,38 +1,34 @@
 package services;
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
-import com.sun.xml.internal.rngom.parse.host.Base;
 import exceptions.InvalidCertificateException;
 import exceptions.InvalidExtractionCertificateOwnerInfoException;
-import facade.Facade;
 
-import java.awt.*;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.Principal;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 
-public class  DigitalCertificateService {
+public class DigitalCertificateService {
     private String certificateHex;
 
-    private static DigitalCertificateService instancia;
+    private static DigitalCertificateService instance;
 
-    public static DigitalCertificateService getDigitalCertificateServiceInstance() {
-        if (instancia == null)
-            instancia = new DigitalCertificateService();
-        return instancia;
+    public static DigitalCertificateService getInstance() {
+        if (instance == null)
+            instance = new DigitalCertificateService();
+        return instance;
     }
 
     // recebe o caminho de um arquivo contendo um certificado
     // digital e retorna o seu conteudo como objeto X509Certificate
     public X509Certificate loadCertificate(String path) throws FileNotFoundException, InvalidCertificateException {
         try {
-            this.getCertificate(path);
             return (X509Certificate) CertificateFactory.getInstance("X509")
                     .generateCertificate(new FileInputStream(new File(path)));
         } catch (CertificateException | IOException e) {
@@ -58,13 +54,13 @@ public class  DigitalCertificateService {
             ownerInfo.put("VALIDUNTIL", certificate.getNotAfter().toString());
             Principal issuer = certificate.getIssuerDN();
             String[] issuerInfoArray = owner.getName().split(", ");
-            for (String s :issuerInfoArray) {
+            for (String s : issuerInfoArray) {
                 String[] issuerInfoSplitedArray = s.split("=");
-                if(issuerInfoSplitedArray[0].equals("CN")){
+                if (issuerInfoSplitedArray[0].equals("CN")) {
                     ownerInfo.put("ISSUER", issuerInfoSplitedArray[1]);
                 }
             }
-            ownerInfo.put("CERTIFICATE",this.certificateHex);
+            ownerInfo.put("CERTIFICATE", this.certificateHex);
 
             return ownerInfo;
         } catch (Exception e) {
@@ -91,8 +87,8 @@ public class  DigitalCertificateService {
                 textAll += singleChar;
             }
 
-            String [] text = textAll.split("-----BEGIN CERTIFICATE-----");
-            this.certificateHex = text[1].replace("-----END CERTIFICATE-----","");
+            String[] text = textAll.split("-----BEGIN CERTIFICATE-----");
+            this.certificateHex = text[1].replace("-----END CERTIFICATE-----", "");
         } catch (Exception e) {
             throw e;
         }
