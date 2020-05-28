@@ -7,11 +7,15 @@ import models.User;
 import repositories.LockedUserRepository;
 import repositories.UserRepository;
 
+import java.awt.*;
 import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Random;
+import java.util.List;
 
 public class AuthenticationService {
     private static AuthenticationService instancia;
@@ -78,7 +82,8 @@ public class AuthenticationService {
     public void registerUser(String certificatePath, String group, String password, String passwordConfirmation) throws Exception {
         String salt = this.saltGenerator();
         System.out.println(certificatePath);
-        User user = new User(password + salt, passwordConfirmation + salt, group, certificatePath, 0, 0);
+        String encryptedPw = PasswordCipherService.getInstance().encryptPassword(password + salt);
+        User user = new User(encryptedPw, encryptedPw, group, certificatePath, 0, 0);
         user.setSalt(salt);
         String errors = this.verifyFields(user);
 
@@ -169,7 +174,7 @@ public class AuthenticationService {
         LockedUserRepository.getLockedUserRepositoryInstance().updateLockedUser(email, false);
     }
 
-    private String saltGenerator() {
+    public String saltGenerator() {
         String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         String salt = "";
         Random rand = new Random();
@@ -203,11 +208,65 @@ public class AuthenticationService {
         return errors;
     }
 
-    public boolean verifyPassword(String email, int cont, String n1, String n2) throws SQLException {
-        User user = userRepository.getUser(email);
-        String pw = user.getPassword().substring(0, user.getPassword().length() - 10);
-        if (cont <= pw.length() && (pw.substring(cont - 1, cont).equals(n1) || pw.substring(cont - 1, cont).equals(n2)))
-            return true;
+//    public boolean verifyPassword(String email, int cont, String n1, String n2) throws SQLException {
+//        User user = userRepository.getUser(email);
+//        String pw = user.getPassword().substring(0, user.getPassword().length() - 10);
+//        if (cont <= pw.length() && (pw.substring(cont - 1, cont).equals(n1) || pw.substring(cont - 1, cont).equals(n2)))
+//            return true;
+//        return false;
+//    }
+
+    public boolean verifyPassword(List<int[]> typedPw, String email) throws Exception {
+
+        User user = this.findUser(email);
+
+        String currentPw = "";
+        int[] index = new int[9];
+
+        /* Testa todas as possiveis combinacoes de pares */
+        for (index[0] = 0; index[0] < 2; index[0]++) {
+            for (index[1] = 0; index[1] < 2; index[1]++) {
+                for (index[2] = 0; index[2] < 2; index[2]++) {
+                    for (index[3] = 0; index[3] < 2; index[3]++) {
+                        for (index[4] = 0; index[4] < 2; index[4]++) {
+                            for (index[5] = 0; index[5] < 2; index[5]++) {
+                                for (index[6] = 0; index[6] < 2; index[6]++) {
+                                    for (index[7] = 0; index[7] < 2; index[7]++) {
+                                        for (index[8] = 0; index[8] < 2; index[8]++) {
+                                            for (int i = 0; i < typedPw.size(); i++) {                // Para cada possivel combinacao dos pares:
+                                                currentPw += typedPw.get(i)[index[i]];    // Monta string com senha corrente
+                                            }
+
+                                            // Chama funcao que obtem hash da senha+salt em string hex
+                                            String value = PasswordCipherService.getInstance().encryptPassword(currentPw + user.getSalt());
+                                            System.out.println(currentPw + "   :  " + value);
+                                            // Verifica se valorCalculado eh igual a valorArmazenado da senha
+                                            if (value.equals(user.getPassword())) {
+                                                return true;
+                                            }
+
+                                            currentPw = "";
+                                            if (typedPw.size() < 9) {
+                                                break;
+                                            }
+                                        }
+                                        if (typedPw.size() < 8) {
+                                            break;
+                                        }
+                                    }
+                                    if (typedPw.size() < 7) {
+                                        break;
+                                    }
+
+                                    /* Nao achou nenhuma combinacao de digitos valida */
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return false;
     }
 }

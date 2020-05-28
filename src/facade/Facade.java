@@ -9,7 +9,9 @@ import services.IndexService;
 import views.EmailView;
 
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 public class Facade {
@@ -66,8 +68,8 @@ public class Facade {
         AuthenticationService.getAuthenticationInstance().lockUser(email);
     }
 
-    public static boolean verifyPassword(String email, int cont, String n1, String n2) throws SQLException {
-        return AuthenticationService.getAuthenticationInstance().verifyPassword(email, cont, n1, n2);
+    public static boolean verifyPassword(List<int[]> typedPw, String email) throws Exception {
+        return AuthenticationService.getAuthenticationInstance().verifyPassword(typedPw,email);
     }
 
     public static void makeUserLogged(String email) throws Exception {

@@ -6,8 +6,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.List;
 
 public class PasswordView extends Frame implements ActionListener {
     private static EmailView instance;
@@ -31,6 +35,7 @@ public class PasswordView extends Frame implements ActionListener {
     private JButton btn5;
     private JButton btndelete;
     private int contPress = 0;
+    private List<int[]> typedPw;
     private boolean passwordIsValid = false;
 
     public PasswordView() throws SQLException {
@@ -145,30 +150,34 @@ public class PasswordView extends Frame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == btndelete){
-            contPress = 0;
             passPassword.setText("");
             passwordIsValid = false;
             this.panel.repaint();
         }
 
         if(e.getSource() == btn1 ||e.getSource() == btn2 || e.getSource() == btn3 || e.getSource() == btn4 || e.getSource() == btn5 ){
-            contPress++;
             String[] nums = ((JButton)e.getSource()).getText().split(" ou ");
+            if(this.typedPw == null){
+                this.typedPw = new ArrayList<>();
+            }
+
+            int[] typed = new int[2];
+            typed[0] = Integer.parseInt(nums[0]);
+            typed[1] = Integer.parseInt(nums[1]);
+            this.typedPw.add(typed);
 
             passPassword.setText(passPassword.getText() + "*");
             this.panel.repaint();
             try {
-                this.passwordIsValid = Facade.getFacadeInstance().verifyPassword(email, contPress, nums[0], nums[1]);
                 this.numbers = this.generateOrder();
                 this.changeButtons();
                 this.panel.repaint();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
         }
 
         if(e.getSource() == btnStart){
-            this.contPress=0;
             if(this.passwordErrors > 2){
                 this.passwordErrors=0;
                 try {
@@ -180,7 +189,7 @@ public class PasswordView extends Frame implements ActionListener {
                 }
             } else {
                 try {
-                    if (this.passwordIsValid) {
+                    if (Facade.getFacadeInstance().verifyPassword(typedPw, this.email)){
                         this.passwordIsValid = false;
                         this.setVisible(false);
                         this.dispose();

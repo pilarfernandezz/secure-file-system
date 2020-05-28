@@ -17,6 +17,8 @@ public class PvtKeyView extends Frame implements ActionListener {
     private JLabel lblText;
     private JLabel lblPath;
     private JLabel lblAlert;
+    private JLabel lblSecret;
+    private  JTextField txtSecret;
     private static JTextField txtPath = null;
     private static JButton btnStart;
     private static JButton btnCancel;
@@ -46,9 +48,17 @@ public class PvtKeyView extends Frame implements ActionListener {
 
         lblAlert = new JLabel("Chave privada inválida.");
         lblAlert.setForeground(Color.red);
-        lblAlert.setBounds(320, 200, 200, 50);
+        lblAlert.setBounds(320, 230, 200, 50);
         this.panel.add(lblAlert);
         lblAlert.setVisible(false);
+
+        lblPath = new JLabel("Frase secreta da chave privada:");
+        lblPath.setBounds(150, 190, 300, 50);
+        this.panel.add(lblPath);
+
+        txtPath = new JTextField();
+        txtPath.setBounds(360, 200, 200, 30);
+        this.panel.add(txtPath);
 
         btnStart = new JButton("Entrar");
         btnStart.setBounds(280, 300, 100, 40);

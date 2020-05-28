@@ -1,4 +1,6 @@
 import facade.Facade;
+import services.AuthenticationService;
+import services.PasswordCipherService;
 import views.ConsultView;
 import views.EmailView;
 import views.PvtKeyView;
@@ -12,12 +14,13 @@ public class Main {
     private static Facade facade;
 
     public static void main(String args[]) throws Exception {
-
-
-     //  new ConsultView();
+//        String salt = AuthenticationService.getAuthenticationInstance().saltGenerator();
+//
+//        System.out.println( salt + " " +PasswordCipherService.getInstance().encryptPassword("159753" + salt));
+//     //  new ConsultView();
      //   new EmailView();
-       // new PvtKeyView();
-       facade.start();
+        //new PvtKeyView();
+      facade.start();
          //   new ConsultView();
 //        byte[] index = facade.decryptFile("Keys/", "Files/", "user01", "index", false, null);
 //        byte[] file1 = facade.decryptFile("Keys/", "Files/", "user01", "XXYYZZ11", true, IndexService.getInstance().getIndexInfo(index).get("XXYYZZ11"));
