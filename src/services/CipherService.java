@@ -83,7 +83,7 @@ public class CipherService {
 
             //carreguei o certificado do user em memoria
             System.out.println("Obtendo certificado digital do usuario " + userName + "...");
-            this.setCertificate(DigitalCertificateService.getInstance().loadCertificate(this.getKeysRootPath().concat(userName.concat("-x509.crt"))));
+            this.setCertificate(DigitalCertificateService.getInstance().loadCertificate(this.getKeysRootPath().concat(userName.concat("-x509.crt")),true));
             System.out.println("Certificado digital do usuario " + userName + "  obtido com sucesso.");
 
             //carreguei a chave publica do admin em memoria

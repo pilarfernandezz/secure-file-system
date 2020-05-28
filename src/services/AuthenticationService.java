@@ -2,16 +2,28 @@ package services;
 
 import exceptions.InvalidCertificateException;
 import exceptions.InvalidExtractionCertificateOwnerInfoException;
+import exceptions.InvalidKeyFileException;
 import models.LockedUser;
 import models.User;
 import repositories.LockedUserRepository;
 import repositories.UserRepository;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.awt.*;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Random;
+import java.util.List;
 
 public class AuthenticationService {
     private static AuthenticationService instancia;
@@ -21,11 +33,13 @@ public class AuthenticationService {
     private static UserRepository userRepository;
     private static LockedUserRepository lockedUserRepository;
     private static DigitalCertificateService digitalCertificateService;
+    private static KeyService keyService;
     private int totalUsers = 0;
 
     public static AuthenticationService getAuthenticationInstance() throws SQLException {
         userRepository = UserRepository.getUserRepositoryInstance();
         lockedUserRepository = LockedUserRepository.getLockedUserRepositoryInstance();
+        keyService = KeyService.getInstance();
         digitalCertificateService = DigitalCertificateService.getInstance();
         if (instancia == null)
             instancia = new AuthenticationService();
@@ -36,14 +50,15 @@ public class AuthenticationService {
         return userRepository.countUsers();
     }
 
-    public static void getDataFromCertificate(User user, String path) throws FileNotFoundException, InvalidCertificateException, InvalidExtractionCertificateOwnerInfoException {
-        Map<String, String> data = digitalCertificateService.extractCertificateOwnerInfo(path);
+    public static User getDataFromCertificate(User user, String path) throws FileNotFoundException, InvalidCertificateException, InvalidExtractionCertificateOwnerInfoException {
+        Map<String, String> data = digitalCertificateService.extractCertificateOwnerInfo(path, true);
         user.setName(data.get("CN"));
         user.setEmail(data.get("EMAILADDRESS"));
         user.setCertificate(data.get("CERTIFICATE"));
+        return user;
     }
 
-    public boolean checkEmail(String email) throws SQLException {
+    public boolean checkEmail(String email) throws SQLException, FileNotFoundException, InvalidCertificateException {
         if (this.loggedUser != null) {
             System.out.println("Já existe um usuário logado");
             return false;
@@ -63,7 +78,7 @@ public class AuthenticationService {
         this.loggedUser.setTotalAccess(this.loggedUser.getTotalAccess() + 1);
         userRepository.updateTotalAccess(this.loggedUser.getId(), this.loggedUser.getTotalAccess());
         System.out.println(this.loggedUser.getTotalAccess());
-
+        //this.loggedUser = this.getDataFromCertificate(this.loggedUser, this.loggedUser.getCertificatePath());
         userRepository.updateUser(this.loggedUser);
     }
 
@@ -76,13 +91,13 @@ public class AuthenticationService {
     public void registerUser(String certificatePath, String group, String password, String passwordConfirmation) throws Exception {
         String salt = this.saltGenerator();
         System.out.println(certificatePath);
-        User user = new User(password + salt, passwordConfirmation + salt, group, certificatePath, 0, 0);
+        String encryptedPw = PasswordCipherService.getInstance().encryptPassword(password + salt);
+        User user = new User(encryptedPw, encryptedPw, group, certificatePath, 0, 0);
         user.setSalt(salt);
         String errors = this.verifyFields(user);
 
-        System.out.println(certificatePath);
-        AuthenticationService.getDataFromCertificate(user, certificatePath);
-
+        user = AuthenticationService.getDataFromCertificate(user, certificatePath);
+        System.out.println(" authenticationservice" + user.getCertificate());
         if (errors != "") {
             throw new Exception(errors);
         }
@@ -95,14 +110,13 @@ public class AuthenticationService {
         }
 
         this.totalUsers++;
-
         userRepository.createUser(user);
     }
 
     public void updateUser(String certificatePath, String password, String passwordConfirmation) throws Exception {
         System.out.println("aaaa" + certificatePath);
         this.loggedUser.setCertificatePath(certificatePath);
-        AuthenticationService.getDataFromCertificate(this.loggedUser, certificatePath);
+        this.loggedUser = AuthenticationService.getDataFromCertificate(this.loggedUser, certificatePath);
         this.loggedUser.setPassword(password + this.loggedUser.getSalt());
         this.loggedUser.setPasswordConfirmation(passwordConfirmation + this.loggedUser.getSalt());
         String errors = this.verifyFields(this.loggedUser);
@@ -159,7 +173,7 @@ public class AuthenticationService {
         return false;
     }
 
-    public void lockUser(String email) throws SQLException {
+    public void lockUser(String email) throws SQLException, FileNotFoundException, InvalidCertificateException {
         User user = userRepository.getUser(email);
         LockedUserRepository.getLockedUserRepositoryInstance().createLockedUser(user);
     }
@@ -168,7 +182,7 @@ public class AuthenticationService {
         LockedUserRepository.getLockedUserRepositoryInstance().updateLockedUser(email, false);
     }
 
-    private String saltGenerator() {
+    public String saltGenerator() {
         String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         String salt = "";
         Random rand = new Random();
@@ -183,7 +197,6 @@ public class AuthenticationService {
 
         return salt;
     }
-
 
     public String verifyFields(User user) {
         String errors = "";
@@ -202,11 +215,63 @@ public class AuthenticationService {
         return errors;
     }
 
-    public boolean verifyPassword(String email, int cont, String n1, String n2) throws SQLException {
-        User user = userRepository.getUser(email);
-        String pw = user.getPassword().substring(0, user.getPassword().length() - 10);
-        if (cont <= pw.length() && (pw.substring(cont - 1, cont).equals(n1) || pw.substring(cont - 1, cont).equals(n2)))
-            return true;
+    public boolean verifyPassword(List<int[]> typedPw, String email) throws Exception {
+
+        User user = this.findUser(email);
+
+        String currentPw = "";
+        int[] index = new int[9];
+
+        /* Testa todas as possiveis combinacoes de pares */
+        for (index[0] = 0; index[0] < 2; index[0]++) {
+            for (index[1] = 0; index[1] < 2; index[1]++) {
+                for (index[2] = 0; index[2] < 2; index[2]++) {
+                    for (index[3] = 0; index[3] < 2; index[3]++) {
+                        for (index[4] = 0; index[4] < 2; index[4]++) {
+                            for (index[5] = 0; index[5] < 2; index[5]++) {
+                                for (index[6] = 0; index[6] < 2; index[6]++) {
+                                    for (index[7] = 0; index[7] < 2; index[7]++) {
+                                        for (index[8] = 0; index[8] < 2; index[8]++) {
+                                            for (int i = 0; i < typedPw.size(); i++) {                // Para cada possivel combinacao dos pares:
+                                                currentPw += typedPw.get(i)[index[i]];    // Monta string com senha corrente
+                                            }
+
+                                            // Chama funcao que obtem hash da senha+salt em string hex
+                                            String value = PasswordCipherService.getInstance().encryptPassword(currentPw + user.getSalt());
+                                            System.out.println(currentPw + "   :  " + value);
+                                            // Verifica se valorCalculado eh igual a valorArmazenado da senha
+                                            if (value.equals(user.getPassword())) {
+                                                return true;
+                                            }
+
+                                            currentPw = "";
+                                            if (typedPw.size() < 9) {
+                                                break;
+                                            }
+                                        }
+                                        if (typedPw.size() < 8) {
+                                            break;
+                                        }
+                                    }
+                                    if (typedPw.size() < 7) {
+                                        break;
+                                    }
+
+                                    /* Nao achou nenhuma combinacao de digitos valida */
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
         return false;
+    }
+
+    public boolean keysValidation(String email, String path, String secret) throws Exception {
+        User user = this.findUser(email);
+        X509Certificate cert = digitalCertificateService.loadCertificate(user.getCertificate(), false);
+        return keyService.verifyKeyPairIntegrity(keyService.loadPublicKey(cert), keyService.loadPrivateKey(path, secret));
     }
 }

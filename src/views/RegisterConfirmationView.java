@@ -87,14 +87,6 @@ public class RegisterConfirmationView extends Frame implements ActionListener {
         lblGroup.setBounds(110, 340, 300, 20);
         this.panel.add(lblGroup);
 
-        lblPassword = new JLabel("Senha: " + RegisterConfirmationView.password);
-        lblPassword.setBounds(110, 365, 300, 20);
-        this.panel.add(lblPassword);
-
-        lblPassword = new JLabel("Confirmação de senha: " + RegisterConfirmationView.passwordConfirmation);
-        lblPassword.setBounds(110, 390, 300, 20);
-        this.panel.add(lblPassword);
-
         btnRegister = new JButton("Registrar");
         btnRegister.setBounds(280, 450, 100, 40);
         this.panel.add(btnRegister);

@@ -1,7 +1,10 @@
 package repositories;
 
+import exceptions.InvalidCertificateException;
 import models.User;
+import services.DigitalCertificateService;
 
+import java.io.FileNotFoundException;
 import java.sql.*;
 
 public class UserRepository {
@@ -68,6 +71,7 @@ public class UserRepository {
     public void createUser(User user) {
         try {
             String query = "insert into users (id,email,password,name,user_group, certificate,salt) values(?,?,?,?,?,?,?);";
+            System.out.println(user.getCertificate());
             PreparedStatement ps = this.conn.prepareStatement(query);
             ps.setInt(1, this.getNextId());
             ps.setString(2, user.getEmail());
@@ -115,7 +119,7 @@ public class UserRepository {
         }
     }
 
-    public User getUser(String email) throws SQLException {
+    public User getUser(String email) throws SQLException, FileNotFoundException, InvalidCertificateException {
         String query = "select * from users where email = '" + email + "';";
         ResultSet res = this.conn.createStatement().executeQuery(query);
         if (res.next()) {
@@ -125,6 +129,7 @@ public class UserRepository {
             user.setName(res.getString("name"));
             user.setSalt(res.getString("salt"));
             user.setId(res.getInt("id"));
+            System.out.println(user);
             return user;
         }
         return null;

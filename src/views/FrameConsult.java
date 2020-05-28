@@ -2,19 +2,19 @@ package views;
 
 import facade.Facade;
 
+import javax.swing.*;
 import java.awt.*;
 import java.sql.SQLException;
-import javax.swing.*;
 
 @SuppressWarnings("serial")
-public class Frame extends JFrame{
+public class FrameConsult extends JFrame{
     protected JPanel panel = new JPanel();
     JLabel login;
     JLabel userGroup;
     JLabel name;
 
-    public Frame() throws SQLException {
-        this.setSize(800, 600);
+    public FrameConsult() throws SQLException {
+        this.setSize(1600, 950);
         setLayout(null);
         this.setLocationRelativeTo(null);
         this.setBackground(Color.WHITE);
@@ -25,17 +25,17 @@ public class Frame extends JFrame{
 
         if(Facade.getLoggedUser()!= null) {
             login = new JLabel(Facade.getLoggedUser().getEmail());
-            login.setBounds(50, -250, 800, 600);
+            login.setBounds(150, -250, 800, 600);
             this.login.setVisible(false);
             this.panel.add(login);
 
             userGroup = new JLabel(Facade.getLoggedUser().getGroup());
-            userGroup.setBounds(350, -250, 800, 600);
+            userGroup.setBounds(700, -250, 800, 600);
             this.userGroup.setVisible(false);
             this.panel.add(userGroup);
 
             name = new JLabel(Facade.getLoggedUser().getName());
-            name.setBounds(550, -250, 800, 600);
+            name.setBounds(1400, -250, 800, 600);
             this.name.setVisible(false);
             this.panel.add(name);
         }

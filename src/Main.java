@@ -1,21 +1,33 @@
 import facade.Facade;
-import services.IndexService;
+import services.AuthenticationService;
+import services.PasswordCipherService;
+import views.ConsultView;
+import views.EmailView;
+import views.PvtKeyView;
 
 import javax.crypto.NoSuchPaddingException;
 import java.security.NoSuchAlgorithmException;
 
 public class Main {
 
+
     private static Facade facade;
 
     public static void main(String args[]) throws Exception {
-        setupAllBeforeStart();
+//        String salt = AuthenticationService.getAuthenticationInstance().saltGenerator();
+//
+//        System.out.println( salt + " " +PasswordCipherService.getInstance().encryptPassword("159753" + salt));
+//     //  new ConsultView();
+     //   new EmailView();
+        //new PvtKeyView();
 
-        facade.start();
 
-        byte[] index = facade.decryptFile("Keys/", "Files/", "user01", "index", false, null);
-        byte[] file1 = facade.decryptFile("Keys/", "Files/", "user01", "XXYYZZ11", true, IndexService.getInstance().getIndexInfo(index).get("XXYYZZ11"));
-        byte[] file2 = facade.decryptFile("Keys/", "Files/", "user01", "XXYYZZ22", true, IndexService.getInstance().getIndexInfo(index).get("XXYYZZ22"));
+
+      facade.start();
+         //   new ConsultView();
+//        byte[] index = facade.decryptFile("Keys/", "Files/", "user01", "index", false, null);
+//        byte[] file1 = facade.decryptFile("Keys/", "Files/", "user01", "XXYYZZ11", true, IndexService.getInstance().getIndexInfo(index).get("XXYYZZ11"));
+//        byte[] file2 = facade.decryptFile("Keys/", "Files/", "user01", "XXYYZZ22", true, IndexService.getInstance().getIndexInfo(index).get("XXYYZZ22"));
     }
 
     private static void setupAllBeforeStart() throws NoSuchPaddingException, NoSuchAlgorithmException {

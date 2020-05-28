@@ -6,8 +6,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.List;
 
 public class PasswordView extends Frame implements ActionListener {
     private static EmailView instance;
@@ -30,8 +34,7 @@ public class PasswordView extends Frame implements ActionListener {
     private JButton btn4;
     private JButton btn5;
     private JButton btndelete;
-    private int contPress = 0;
-    private boolean passwordIsValid = false;
+    private List<int[]> typedPw;
 
     public PasswordView() throws SQLException {
         super();
@@ -44,7 +47,7 @@ public class PasswordView extends Frame implements ActionListener {
         this.panel.setBounds(0, 0, 800, 600);
         this.panel.add(lblTitle);
 
-        lblText = new JLabel("Digite seu login:");
+        lblText = new JLabel("Digite sua senha:");
         lblText.setBounds(340, 100, 200, 50);
         this.panel.add(lblText);
 
@@ -95,7 +98,7 @@ public class PasswordView extends Frame implements ActionListener {
         this.panel.add(lblAlert);
         lblAlert.setVisible(false);
 
-        btnStart = new JButton("Entrar");
+        btnStart = new JButton("Seguir");
         btnStart.setBounds(280, 400, 100, 40);
         this.panel.add(btnStart);
         btnStart.addActionListener(this);
@@ -145,30 +148,34 @@ public class PasswordView extends Frame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == btndelete){
-            contPress = 0;
             passPassword.setText("");
-            passwordIsValid = false;
+            this.typedPw = null;
             this.panel.repaint();
         }
 
         if(e.getSource() == btn1 ||e.getSource() == btn2 || e.getSource() == btn3 || e.getSource() == btn4 || e.getSource() == btn5 ){
-            contPress++;
             String[] nums = ((JButton)e.getSource()).getText().split(" ou ");
+            if(this.typedPw == null){
+                this.typedPw = new ArrayList<>();
+            }
+
+            int[] typed = new int[2];
+            typed[0] = Integer.parseInt(nums[0]);
+            typed[1] = Integer.parseInt(nums[1]);
+            this.typedPw.add(typed);
 
             passPassword.setText(passPassword.getText() + "*");
             this.panel.repaint();
             try {
-                this.passwordIsValid = Facade.getFacadeInstance().verifyPassword(email, contPress, nums[0], nums[1]);
                 this.numbers = this.generateOrder();
                 this.changeButtons();
                 this.panel.repaint();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
         }
 
         if(e.getSource() == btnStart){
-            this.contPress=0;
             if(this.passwordErrors > 2){
                 this.passwordErrors=0;
                 try {
@@ -180,17 +187,16 @@ public class PasswordView extends Frame implements ActionListener {
                 }
             } else {
                 try {
-                    if (this.passwordIsValid) {
-                        this.passwordIsValid = false;
+                    if (Facade.getFacadeInstance().verifyPassword(typedPw, this.email)){
                         this.setVisible(false);
                         this.dispose();
-                        Facade.getFacadeInstance().makeUserLogged(this.email);
-                        MenuView.showScreen();
+                        PvtKeyView.showScreen(this.email);
                     } else {
                         this.passwordErrors++;
                         lblAlert.setVisible(true);
                         this.panel.repaint();
                     }
+                    this.typedPw = null;
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 } catch (Exception exception) {
