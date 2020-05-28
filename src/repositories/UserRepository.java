@@ -91,7 +91,6 @@ public class UserRepository {
     public void updateUser(User user) throws Exception {
         try {
 
-            System.out.println("------- " + user.getCertificate());
             String query = "update users set email = ?, password = ?, name = ?, user_group = ?, certificate = ?, salt = ? where id = ?";
             PreparedStatement ps = this.conn.prepareStatement(query);
             ps.setString(1, user.getEmail());
@@ -129,7 +128,6 @@ public class UserRepository {
             user.setName(res.getString("name"));
             user.setSalt(res.getString("salt"));
             user.setId(res.getInt("id"));
-            System.out.println(user);
             return user;
         }
         return null;

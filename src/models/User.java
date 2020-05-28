@@ -2,6 +2,8 @@ package models;
 
 import services.DigitalCertificateService;
 
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
 public class User {
@@ -17,6 +19,9 @@ public class User {
     private boolean allowed;
     private int totalAccess = 0;
     private int totalConsults = 0;
+    private PrivateKey pvtKey;
+    private PublicKey pbcKey;
+
 
     public User(String password, String passwordConfirmation, String group, String certificatePath, int totalAccess, int totalConsults) {
         this.passwordConfirmation = passwordConfirmation;
@@ -122,6 +127,22 @@ public class User {
 
     public void setTotalConsults(int totalConsults) {
         this.totalConsults = totalConsults;
+    }
+
+    public PrivateKey getPvtKey() {
+        return pvtKey;
+    }
+
+    public void setPvtKey(PrivateKey pvtKey) {
+        this.pvtKey = pvtKey;
+    }
+
+    public PublicKey getPbcKey() {
+        return pbcKey;
+    }
+
+    public void setPbcKey(PublicKey pbcKey) {
+        this.pbcKey = pbcKey;
     }
 
     @Override

@@ -74,8 +74,8 @@ public class Facade {
         return AuthenticationService.getAuthenticationInstance().verifyPassword(typedPw,email);
     }
 
-    public static void makeUserLogged(String email) throws Exception {
-        AuthenticationService.getAuthenticationInstance().makeUserLogged(email);
+    public static void makeUserLogged(String email,String path, String secret) throws Exception {
+        AuthenticationService.getAuthenticationInstance().makeUserLogged(email,path,secret);
     }
 
     public static int getRowSize(){
@@ -83,14 +83,11 @@ public class Facade {
         //TODO DESMARRETAR
     }
 
-    public static byte[] decryptFile(String keysRootPath, String fileRootPath, String userName, String fileName, boolean save, String newFileName) throws Exception {
-        CipherService.getInstance().setKeysRootPath(keysRootPath);
-        CipherService.getInstance().setFileRootPath(fileRootPath);
-        System.out.println(keysRootPath + " " + fileRootPath);
-        return CipherService.getInstance().decryptFileContent(userName, fileName, save, newFileName);
+    public static byte[] decryptFile(String email, String fileName, boolean save, String newFileName) throws Exception {
+        return CipherService.getInstance().decryptFileContent(Facade.findUser(email), fileName, save, newFileName);
     }
 
-    public static Map<String,String> getIndexInfo(byte[] index) throws UnsupportedEncodingException {
+    public static String [][] getIndexInfo(byte[] index) throws UnsupportedEncodingException {
         return IndexService.getInstance().getIndexInfo(index);
     }
 

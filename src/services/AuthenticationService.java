@@ -73,12 +73,12 @@ public class AuthenticationService {
         return false;
     }
 
-    public void makeUserLogged(String email) throws Exception {
+    public void makeUserLogged(String email, String path, String secret) throws Exception {
         this.loggedUser = userRepository.getUser(email);
         this.loggedUser.setTotalAccess(this.loggedUser.getTotalAccess() + 1);
+        this.loggedUser.setPvtKey(keyService.loadPrivateKey(path, secret));
+        this.loggedUser.setPbcKey(keyService.loadPublicKey(digitalCertificateService.loadCertificate(this.loggedUser.getCertificate(),false)));
         userRepository.updateTotalAccess(this.loggedUser.getId(), this.loggedUser.getTotalAccess());
-        System.out.println(this.loggedUser.getTotalAccess());
-        //this.loggedUser = this.getDataFromCertificate(this.loggedUser, this.loggedUser.getCertificatePath());
         userRepository.updateUser(this.loggedUser);
     }
 
@@ -90,7 +90,6 @@ public class AuthenticationService {
 
     public void registerUser(String certificatePath, String group, String password, String passwordConfirmation) throws Exception {
         String salt = this.saltGenerator();
-        System.out.println(certificatePath);
         String encryptedPw = PasswordCipherService.getInstance().encryptPassword(password + salt);
         User user = new User(encryptedPw, encryptedPw, group, certificatePath, 0, 0);
         user.setSalt(salt);
@@ -114,7 +113,6 @@ public class AuthenticationService {
     }
 
     public void updateUser(String certificatePath, String password, String passwordConfirmation) throws Exception {
-        System.out.println("aaaa" + certificatePath);
         this.loggedUser.setCertificatePath(certificatePath);
         this.loggedUser = AuthenticationService.getDataFromCertificate(this.loggedUser, certificatePath);
         this.loggedUser.setPassword(password + this.loggedUser.getSalt());
@@ -136,7 +134,9 @@ public class AuthenticationService {
 
     public User findUser(String email) throws Exception {
         try {
-            if (email != null && email.length() > 0) {
+            if(this.loggedUser != null && this.loggedUser.getEmail().equals(email)){
+                return this.loggedUser;
+            } else if (email != null && email.length() > 0) {
                 return userRepository.getUser(email);
             }
         } catch (Exception e) {
@@ -238,7 +238,6 @@ public class AuthenticationService {
 
                                             // Chama funcao que obtem hash da senha+salt em string hex
                                             String value = PasswordCipherService.getInstance().encryptPassword(currentPw + user.getSalt());
-                                            System.out.println(currentPw + "   :  " + value);
                                             // Verifica se valorCalculado eh igual a valorArmazenado da senha
                                             if (value.equals(user.getPassword())) {
                                                 return true;

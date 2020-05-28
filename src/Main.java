@@ -1,5 +1,6 @@
 import facade.Facade;
 import services.AuthenticationService;
+import services.IndexService;
 import services.PasswordCipherService;
 import views.ConsultView;
 import views.EmailView;
@@ -18,16 +19,13 @@ public class Main {
 //
 //        System.out.println( salt + " " +PasswordCipherService.getInstance().encryptPassword("159753" + salt));
 //     //  new ConsultView();
-     //   new EmailView();
+        //   new EmailView();
         //new PvtKeyView();
 
 
+        facade.start();
+        //   new ConsultView();
 
-      facade.start();
-         //   new ConsultView();
-//        byte[] index = facade.decryptFile("Keys/", "Files/", "user01", "index", false, null);
-//        byte[] file1 = facade.decryptFile("Keys/", "Files/", "user01", "XXYYZZ11", true, IndexService.getInstance().getIndexInfo(index).get("XXYYZZ11"));
-//        byte[] file2 = facade.decryptFile("Keys/", "Files/", "user01", "XXYYZZ22", true, IndexService.getInstance().getIndexInfo(index).get("XXYYZZ22"));
     }
 
     private static void setupAllBeforeStart() throws NoSuchPaddingException, NoSuchAlgorithmException {
