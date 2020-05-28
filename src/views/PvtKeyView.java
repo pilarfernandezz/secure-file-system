@@ -95,7 +95,7 @@ public class PvtKeyView extends Frame implements ActionListener {
                 } else{
                     this.setVisible(false);
                     this.dispose();
-                    Facade.getFacadeInstance().makeUserLogged(this.email);
+                    Facade.getFacadeInstance().makeUserLogged(this.email, txtPath.getText(),txtSecret.getText());
                     MenuView.showScreen();
                 }
             } catch (Exception exception) {

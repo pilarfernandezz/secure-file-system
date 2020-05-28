@@ -119,7 +119,6 @@ public class RegisterView extends Frame implements ActionListener {
         for(int i = 0; i < pw.length()-1;i++){
             System.out.println(pw.length()-1 + " " + i + " " + pw.charAt(i) + " " + pw.charAt(i+1));
             if(pw.charAt(i) == pw.charAt(i+1) || pw.charAt(i) == pw.charAt(i+1)+1 || pw.charAt(i) == pw.charAt(i+1)-1) {
-                System.out.println("entrei");
                 return false;
             }
         }

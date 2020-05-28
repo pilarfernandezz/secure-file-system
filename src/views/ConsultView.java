@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 
 public class ConsultView extends FrameConsult implements ActionListener, MouseListener {
@@ -16,17 +17,15 @@ public class ConsultView extends FrameConsult implements ActionListener, MouseLi
     private JLabel lblTitle;
     private JLabel lblText;
     private JLabel lblTotal;
-    private JLabel lblTotalQtd;
     private JLabel lblAlert;
     private JTextField txtpath;
     private static JButton btnReturn;
     private static JButton btnConsult;
     private int totalQtd = 0;
-    private JLabel[][] table;
     private TableView tableView;
     private byte[] folderContent;
 
-    public ConsultView() throws SQLException {
+    public ConsultView() throws SQLException, UnsupportedEncodingException {
         super();
 
         this.setBackground(Color.WHITE);
@@ -35,8 +34,8 @@ public class ConsultView extends FrameConsult implements ActionListener, MouseLi
         lblTitle.setBounds(580, 40, 1600, 100);
         lblTitle.setFont(titleFont);
         this.panel.add(lblTitle);
-///+ Facade.getLoggedUser().getTotalConsults()
-        lblTotal = new JLabel("Total de consultas do usuário: 0 " );
+
+        lblTotal = new JLabel("Total de consultas do usuário: " + Facade.getLoggedUser().getTotalConsults());
         lblTotal.setBounds(700, -170, 800, 600);
         this.panel.add(lblTotal);
 
@@ -86,9 +85,10 @@ public class ConsultView extends FrameConsult implements ActionListener, MouseLi
             try {
                 Facade.getFacadeInstance().updateConsultNumber();
                 if(txtpath.getText()!= null && txtpath.getText().trim().length()>0){
-                    String rootPath = txtpath.getText().substring(0,txtpath.getText().lastIndexOf("/")+1);
-
-                    this.folderContent = Facade.getFacadeInstance().decryptFile("Keys/",rootPath, Facade.getFacadeInstance().getLoggedUser().getName(),txtpath.getText().substring(txtpath.getText().lastIndexOf("/")+2), false,null);
+                    this.folderContent = Facade.getFacadeInstance().decryptFile(Facade.getFacadeInstance().getLoggedUser().getEmail(), txtpath.getText(),false, null);
+                    tableView.setContent(this.folderContent);
+                    tableView.setPath(txtpath.getText().substring(0,txtpath.getText().lastIndexOf("/")+1));
+                    tableView.showInfo();
                     this.panel.add(tableView);
                     this.panel.repaint();
                 } else {
@@ -115,17 +115,10 @@ public class ConsultView extends FrameConsult implements ActionListener, MouseLi
         }
     }
 
-    public static void showScreen() throws SQLException {
+    public static void showScreen() throws SQLException, UnsupportedEncodingException {
         new ConsultView();
     }
 
-    public int getTotalQtd() {
-        return totalQtd;
-    }
-
-    public void setTotalQtd(int totalQtd) {
-        this.totalQtd = totalQtd;
-    }
 
     @Override
     public void mouseClicked(MouseEvent e) {

@@ -8,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 
 public class MenuView extends Frame implements ActionListener {
@@ -95,7 +96,7 @@ public class MenuView extends Frame implements ActionListener {
             this.dispose();
             try {
                 ConsultView.showScreen();
-            } catch (SQLException throwables) {
+            } catch (SQLException | UnsupportedEncodingException throwables) {
                 throwables.printStackTrace();
             }
             // TODO ADICIONAR CHAMADA DE TELA DE CONSULTA E DESCOMENTAR CODIGO ACIMA
