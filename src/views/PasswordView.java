@@ -34,9 +34,7 @@ public class PasswordView extends Frame implements ActionListener {
     private JButton btn4;
     private JButton btn5;
     private JButton btndelete;
-    private int contPress = 0;
     private List<int[]> typedPw;
-    private boolean passwordIsValid = false;
 
     public PasswordView() throws SQLException {
         super();
@@ -151,7 +149,7 @@ public class PasswordView extends Frame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == btndelete){
             passPassword.setText("");
-            passwordIsValid = false;
+            this.typedPw = null;
             this.panel.repaint();
         }
 
@@ -190,16 +188,15 @@ public class PasswordView extends Frame implements ActionListener {
             } else {
                 try {
                     if (Facade.getFacadeInstance().verifyPassword(typedPw, this.email)){
-                        this.passwordIsValid = false;
                         this.setVisible(false);
                         this.dispose();
-                        Facade.getFacadeInstance().makeUserLogged(this.email);
-                        PvtKeyView.showScreen();
+                        PvtKeyView.showScreen(this.email);
                     } else {
                         this.passwordErrors++;
                         lblAlert.setVisible(true);
                         this.panel.repaint();
                     }
+                    this.typedPw = null;
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 } catch (Exception exception) {

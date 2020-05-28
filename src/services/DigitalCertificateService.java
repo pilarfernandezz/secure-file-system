@@ -3,10 +3,7 @@ package services;
 import exceptions.InvalidCertificateException;
 import exceptions.InvalidExtractionCertificateOwnerInfoException;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.security.Principal;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -26,11 +23,15 @@ public class DigitalCertificateService {
 
     // recebe o caminho de um arquivo contendo um certificado
     // digital e retorna o seu conteudo como objeto X509Certificate
-    public X509Certificate loadCertificate(String path) throws FileNotFoundException, InvalidCertificateException {
+    public X509Certificate loadCertificate(String cert,boolean isFile) throws FileNotFoundException, InvalidCertificateException {
         try {
-            System.out.println(" load certificate " + path);
+            if(isFile) {
+                System.out.println(" load certificate " + cert);
+                return (X509Certificate) CertificateFactory.getInstance("X509")
+                        .generateCertificate(new FileInputStream(new File(cert)));
+            }
             return (X509Certificate) CertificateFactory.getInstance("X509")
-                    .generateCertificate(new FileInputStream(new File(path)));
+                    .generateCertificate(new ByteArrayInputStream(cert.getBytes()));
         } catch (CertificateException | IOException e) {
             throw new InvalidCertificateException("File doesn't match to valid X509 certificate. Please, check the information and try again.");
         }
@@ -38,9 +39,9 @@ public class DigitalCertificateService {
 
     // recebe um certificado digital e retorna um objeto
     // que contem as informacoes do dono do certificado
-    public Map<String, String> extractCertificateOwnerInfo(String path) throws InvalidExtractionCertificateOwnerInfoException {
+    public Map<String, String> extractCertificateOwnerInfo(String path, boolean isFile) throws InvalidExtractionCertificateOwnerInfoException {
         try {
-            X509Certificate certificate = this.loadCertificate(path);
+            X509Certificate certificate = this.loadCertificate(path,isFile);
             Principal owner = certificate.getSubjectDN();
             String[] ownerInfoArray = owner.getName().split(", ");
             Map<String, String> ownerInfo = new HashMap<>();
@@ -76,7 +77,7 @@ public class DigitalCertificateService {
         }
     }
 
-    private String getCertificate(String path) throws IOException {
+    public String getCertificate(String path) throws IOException {
         File file = new File(path);
         String textAll = "";
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
@@ -89,9 +90,10 @@ public class DigitalCertificateService {
             }
 
             String[] text = textAll.split("-----BEGIN CERTIFICATE-----");
-            return text[1].replace("-----END CERTIFICATE-----", "");
+            return "-----BEGIN CERTIFICATE-----".concat(text[1]);
         } catch (Exception e) {
             throw e;
         }
     }
+
 }

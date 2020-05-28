@@ -2,15 +2,23 @@ package services;
 
 import exceptions.InvalidCertificateException;
 import exceptions.InvalidExtractionCertificateOwnerInfoException;
+import exceptions.InvalidKeyFileException;
 import models.LockedUser;
 import models.User;
 import repositories.LockedUserRepository;
 import repositories.UserRepository;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.awt.*;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -25,11 +33,13 @@ public class AuthenticationService {
     private static UserRepository userRepository;
     private static LockedUserRepository lockedUserRepository;
     private static DigitalCertificateService digitalCertificateService;
+    private static KeyService keyService;
     private int totalUsers = 0;
 
     public static AuthenticationService getAuthenticationInstance() throws SQLException {
         userRepository = UserRepository.getUserRepositoryInstance();
         lockedUserRepository = LockedUserRepository.getLockedUserRepositoryInstance();
+        keyService = KeyService.getInstance();
         digitalCertificateService = DigitalCertificateService.getInstance();
         if (instancia == null)
             instancia = new AuthenticationService();
@@ -41,15 +51,14 @@ public class AuthenticationService {
     }
 
     public static User getDataFromCertificate(User user, String path) throws FileNotFoundException, InvalidCertificateException, InvalidExtractionCertificateOwnerInfoException {
-        Map<String, String> data = digitalCertificateService.extractCertificateOwnerInfo(path);
+        Map<String, String> data = digitalCertificateService.extractCertificateOwnerInfo(path, true);
         user.setName(data.get("CN"));
         user.setEmail(data.get("EMAILADDRESS"));
         user.setCertificate(data.get("CERTIFICATE"));
-
         return user;
     }
 
-    public boolean checkEmail(String email) throws SQLException {
+    public boolean checkEmail(String email) throws SQLException, FileNotFoundException, InvalidCertificateException {
         if (this.loggedUser != null) {
             System.out.println("Já existe um usuário logado");
             return false;
@@ -69,7 +78,7 @@ public class AuthenticationService {
         this.loggedUser.setTotalAccess(this.loggedUser.getTotalAccess() + 1);
         userRepository.updateTotalAccess(this.loggedUser.getId(), this.loggedUser.getTotalAccess());
         System.out.println(this.loggedUser.getTotalAccess());
-
+        //this.loggedUser = this.getDataFromCertificate(this.loggedUser, this.loggedUser.getCertificatePath());
         userRepository.updateUser(this.loggedUser);
     }
 
@@ -101,7 +110,6 @@ public class AuthenticationService {
         }
 
         this.totalUsers++;
-
         userRepository.createUser(user);
     }
 
@@ -165,7 +173,7 @@ public class AuthenticationService {
         return false;
     }
 
-    public void lockUser(String email) throws SQLException {
+    public void lockUser(String email) throws SQLException, FileNotFoundException, InvalidCertificateException {
         User user = userRepository.getUser(email);
         LockedUserRepository.getLockedUserRepositoryInstance().createLockedUser(user);
     }
@@ -190,7 +198,6 @@ public class AuthenticationService {
         return salt;
     }
 
-
     public String verifyFields(User user) {
         String errors = "";
         if (user.getPassword() == null || user.getPassword() == "") {
@@ -207,14 +214,6 @@ public class AuthenticationService {
         }
         return errors;
     }
-
-//    public boolean verifyPassword(String email, int cont, String n1, String n2) throws SQLException {
-//        User user = userRepository.getUser(email);
-//        String pw = user.getPassword().substring(0, user.getPassword().length() - 10);
-//        if (cont <= pw.length() && (pw.substring(cont - 1, cont).equals(n1) || pw.substring(cont - 1, cont).equals(n2)))
-//            return true;
-//        return false;
-//    }
 
     public boolean verifyPassword(List<int[]> typedPw, String email) throws Exception {
 
@@ -268,5 +267,11 @@ public class AuthenticationService {
             }
         }
         return false;
+    }
+
+    public boolean keysValidation(String email, String path, String secret) throws Exception {
+        User user = this.findUser(email);
+        X509Certificate cert = digitalCertificateService.loadCertificate(user.getCertificate(), false);
+        return keyService.verifyKeyPairIntegrity(keyService.loadPublicKey(cert), keyService.loadPrivateKey(path, secret));
     }
 }

@@ -18,10 +18,11 @@ public class PvtKeyView extends Frame implements ActionListener {
     private JLabel lblPath;
     private JLabel lblAlert;
     private JLabel lblSecret;
-    private  JTextField txtSecret;
+    private  JPasswordField txtSecret;
     private static JTextField txtPath = null;
     private static JButton btnStart;
     private static JButton btnCancel;
+    private static String email;
 
     public PvtKeyView() throws SQLException {
         super();
@@ -52,13 +53,13 @@ public class PvtKeyView extends Frame implements ActionListener {
         this.panel.add(lblAlert);
         lblAlert.setVisible(false);
 
-        lblPath = new JLabel("Frase secreta da chave privada:");
-        lblPath.setBounds(150, 190, 300, 50);
-        this.panel.add(lblPath);
+        lblSecret = new JLabel("Frase secreta da chave privada:");
+        lblSecret.setBounds(150, 190, 300, 50);
+        this.panel.add(lblSecret);
 
-        txtPath = new JTextField();
-        txtPath.setBounds(360, 200, 200, 30);
-        this.panel.add(txtPath);
+        txtSecret = new JPasswordField();
+        txtSecret.setBounds(360, 200, 200, 30);
+        this.panel.add(txtSecret);
 
         btnStart = new JButton("Entrar");
         btnStart.setBounds(280, 300, 100, 40);
@@ -79,7 +80,8 @@ public class PvtKeyView extends Frame implements ActionListener {
         this.setVisible(true);
     }
 
-    public static void showScreen() throws SQLException {
+    public static void showScreen(String email) throws SQLException {
+        PvtKeyView.email = email;
         new PvtKeyView();
     }
 
@@ -87,12 +89,13 @@ public class PvtKeyView extends Frame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == btnStart){
             try {
-                if(txtPath.getText() == null || txtPath.getText().equals("")){
+                if(txtPath.getText() == null || txtPath.getText().equals("") || !Facade.getFacadeInstance().keysValidation(this.email, txtPath.getText(),txtSecret.getText())){
                     lblAlert.setVisible(true);
                     this.panel.repaint();
                 } else{
                     this.setVisible(false);
                     this.dispose();
+                    Facade.getFacadeInstance().makeUserLogged(this.email);
                     MenuView.showScreen();
                 }
             } catch (Exception exception) {

@@ -20,6 +20,9 @@ public class Main {
 //     //  new ConsultView();
      //   new EmailView();
         //new PvtKeyView();
+
+
+
       facade.start();
          //   new ConsultView();
 //        byte[] index = facade.decryptFile("Keys/", "Files/", "user01", "index", false, null);

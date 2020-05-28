@@ -2,6 +2,8 @@ package models;
 
 import services.DigitalCertificateService;
 
+import java.security.cert.X509Certificate;
+
 public class User {
     private int id;
     private String email;
@@ -133,6 +135,7 @@ public class User {
                 ", name='" + name + '\'' +
                 ", group='" + group + '\'' +
                 ", certificatePath='" + certificatePath + '\'' +
+                ", certificate='" + certificate + '\'' +
                 ", allowed=" + allowed +
                 ", totalAccess=" + totalAccess +
                 ", totalConsults=" + totalConsults +

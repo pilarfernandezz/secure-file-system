@@ -1,5 +1,6 @@
 package facade;
 
+import exceptions.InvalidCertificateException;
 import exceptions.InvalidExtractionCertificateOwnerInfoException;
 import models.User;
 import services.AuthenticationService;
@@ -8,6 +9,7 @@ import services.DigitalCertificateService;
 import services.IndexService;
 import views.EmailView;
 
+import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
@@ -41,14 +43,14 @@ public class Facade {
     }
 
     public static Map<String, String> extractCertificate(String path) throws InvalidExtractionCertificateOwnerInfoException {
-        return DigitalCertificateService.getInstance().extractCertificateOwnerInfo(path);
+        return DigitalCertificateService.getInstance().extractCertificateOwnerInfo(path,true);
     }
 
     public static User getLoggedUser() throws SQLException {
         return AuthenticationService.getAuthenticationInstance().getLoggedUser();
     }
 
-    public static boolean checkEmail(String email) throws SQLException {
+    public static boolean checkEmail(String email) throws SQLException, FileNotFoundException, InvalidCertificateException {
         return AuthenticationService.getAuthenticationInstance().checkEmail(email);
     }
 
@@ -64,7 +66,7 @@ public class Facade {
         return AuthenticationService.getAuthenticationInstance().verifyIsLocked(email);
     }
 
-    public static void lockUser(String email) throws SQLException {
+    public static void lockUser(String email) throws SQLException, FileNotFoundException, InvalidCertificateException {
         AuthenticationService.getAuthenticationInstance().lockUser(email);
     }
 
@@ -90,5 +92,9 @@ public class Facade {
 
     public static Map<String,String> getIndexInfo(byte[] index) throws UnsupportedEncodingException {
         return IndexService.getInstance().getIndexInfo(index);
+    }
+
+    public static boolean keysValidation(String email, String path, String secret) throws Exception {
+        return AuthenticationService.getAuthenticationInstance().keysValidation(email, path, secret);
     }
 }
