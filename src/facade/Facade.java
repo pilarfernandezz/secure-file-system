@@ -1,12 +1,16 @@
 package facade;
 
 import exceptions.InvalidCertificateException;
+import exceptions.InvalidDecryptFileException;
 import exceptions.InvalidExtractionCertificateOwnerInfoException;
 import models.User;
 import services.*;
 import views.EmailView;
 
+import javax.crypto.NoSuchPaddingException;
 import java.io.FileNotFoundException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -67,7 +71,7 @@ public class Facade {
         AuthenticationService.getInstance().makeUserLogged(email, path, secret);
     }
 
-    public static byte[] decryptFile(String email, String fileName, boolean save, String newFileName) throws Exception {
+    public static byte[] decryptFile(String email, String fileName, boolean save, String newFileName) throws InvalidKeyException, InvalidDecryptFileException, NoSuchPaddingException, NoSuchAlgorithmException {
         return CipherService.getInstance().decryptFileContent(Facade.findUser(email), fileName, save, newFileName);
     }
 
@@ -75,12 +79,12 @@ public class Facade {
         return IndexService.getInstance().getIndexInfo(index);
     }
 
-    public static boolean keysValidation(String email, String path, String secret) {
+    public static int keysValidation(String email, String path, String secret) {
         return AuthenticationService.getInstance().keysValidation(email, path, secret);
     }
 
-    public static boolean validatePassword(String pw) {
-        return AuthenticationService.getInstance().validatePassword(pw);
+    public static boolean validatePassword(String pw, String pwConf) {
+        return AuthenticationService.getInstance().validatePassword(pw, pwConf);
     }
 
     public static boolean validateCertificate(String path) throws FileNotFoundException, InvalidCertificateException {

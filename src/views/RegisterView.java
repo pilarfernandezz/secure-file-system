@@ -102,7 +102,7 @@ public class RegisterView extends Frame implements ActionListener {
         this.panel.add(lblAlertCert);
         lblAlertCert.setVisible(false);
 
-        lblAlertPw = new JLabel("Senha deve ter entre 6 e 8 caracteres numéricos e não pode conter sequências e repetições de caracteres");
+        lblAlertPw = new JLabel();
         lblAlertPw.setForeground(Color.red);
         lblAlertPw.setBounds(60, 390, 700, 50);
         this.panel.add(lblAlertPw);
@@ -140,22 +140,29 @@ public class RegisterView extends Frame implements ActionListener {
         if (e.getSource() == btnRegister) {
             Facade.registerLogMessage(6002, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
             try {
-                boolean invalidPw = password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+") || !Facade.validatePassword(password.getText());
-                boolean invalidCert = certificatePath.getText().trim().equals("") || certificatePath.getText() == null || !Facade.validateCertificate(certificatePath.getText());
-                lblAlertPw.setVisible(invalidPw);
-                lblAlertCert.setVisible(invalidCert);
-                this.panel.repaint();
-
-                if (!invalidCert || !invalidPw) {
-                    this.setVisible(false);
-                    this.dispose();
-                    try {
-                        ConfirmationView.showScreen(true, certificatePath.getText(), (btnuser.isSelected() ? "Usuário" : "Administrador"), password.getText(), passwordConfirmation.getText());
-                    } catch (InvalidExtractionCertificateOwnerInfoException ex) {
-                        lblAlertCert.setVisible(true);
-                    }
+                if (!passwordConfirmation.getText().equals(password.getText())) {
+                    this.lblAlertPw.setText("Senhas não coincidem");
+                    this.lblAlertPw.setVisible(true);
+                    this.panel.repaint();
                 } else {
-                    Facade.registerLogMessage(invalidPw ? 6003 : 6004, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+                    boolean invalidPw = password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+") || !Facade.validatePassword(password.getText(), passwordConfirmation.getText());
+                    boolean invalidCert = certificatePath.getText().trim().equals("") || certificatePath.getText() == null || !Facade.validateCertificate(certificatePath.getText());
+
+                    if (!invalidCert && !invalidPw) {
+                        this.setVisible(false);
+                        this.dispose();
+                        try {
+                            ConfirmationView.showScreen(true, certificatePath.getText(), (btnuser.isSelected() ? "Usuário" : "Administrador"), password.getText(), passwordConfirmation.getText());
+                        } catch (InvalidExtractionCertificateOwnerInfoException ex) {
+                            lblAlertCert.setVisible(true);
+                        }
+                    } else {
+                        lblAlertPw.setText("Senha deve ter entre 6 e 8 caracteres numéricos e não pode conter sequências e repetições de caracteres");
+                        lblAlertPw.setVisible(invalidPw);
+                        lblAlertCert.setVisible(invalidCert);
+                        this.panel.repaint();
+                        Facade.registerLogMessage(invalidPw ? 6003 : 6004, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+                    }
                 }
             } catch (FileNotFoundException | InvalidCertificateException ex) {
                 lblAlertCert.setVisible(true);

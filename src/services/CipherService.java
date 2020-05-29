@@ -19,6 +19,8 @@ public class CipherService {
     private static CipherService instance;
     private Cipher cipher;
     private byte[] fileSeed;
+    private boolean isDecrypted;
+    private String newFileName;
 
     public static CipherService getInstance() throws NoSuchAlgorithmException, NoSuchPaddingException {
         if (instance == null) instance = new CipherService();
@@ -39,8 +41,9 @@ public class CipherService {
 
     public byte[] decryptFileContent(User user, String fileName, boolean save, String newFileName) throws InvalidKeyException, InvalidDecryptFileException {
         try {
+            this.newFileName = newFileName;
             System.out.println("Verificando integridade e autenticidade do par de chaves do usuario " + user.getName() + "...");
-            if (KeyService.getInstance().verifyKeyPairIntegrity(user.getPbcKey(), user.getPvtKey())) {
+            if (KeyService.getInstance().verifyKeyPairIntegrity(user.getPbcKey(), user.getPvtKey()) == 0) {
                 System.out.println("Par de chaves do usuario " + user.getName() + " verificado, integro e autentico");
 
                 //carrego o envelope digital e encontro a semente do PRNG da chave simetrica do arquivo em memoria
@@ -51,7 +54,7 @@ public class CipherService {
                 System.out.println("Decriptando arquivo " + fileName + "...");
                 byte[] decripted = this.decrypt(user.getPbcKey(), fileName.concat(".enc"), fileName.concat(".asd"), save);
 
-                if (decripted != null) {
+                if (decripted != null && this.isDecrypted) {
                     System.out.println("Arquivo " + fileName + " decriptado com sucesso.");
 
                     if (save && newFileName != null && newFileName.trim().length() > 0) {
@@ -62,8 +65,10 @@ public class CipherService {
                     }
 
                     return decripted;
-                } else {
+                } else if (this.isDecrypted) {
                     throw new InvalidDecryptFileException("Falha na decriptação do arquivo " + fileName + ".");
+                } else {
+                    throw new InvalidKeyException("Falha na decriptação do arquivo " + fileName + ".");
                 }
             } else {
                 throw new InvalidKeyPairException("Par de chaves é inválido.");
@@ -93,15 +98,17 @@ public class CipherService {
             cipher.init(Cipher.DECRYPT_MODE, keyGenerator.generateKey());
             byte[] decripted = cipher.doFinal(buffer);
             if (decripted != null) {
-                Facade.registerLogMessage(!save ? 8005 : 8013, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+                this.isDecrypted = true;
+                Facade.registerLogMessage(!save ? 8005 : 8013, Facade.getLoggedUser().getEmail(), this.newFileName, LocalDateTime.now());
                 if (verifyFileContentIntegrity(publicKey, decripted, signPath)) {
-                    Facade.registerLogMessage(!save ? 8006 : 8014, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+                    Facade.registerLogMessage(!save ? 8006 : 8014, Facade.getLoggedUser().getEmail(), this.newFileName, LocalDateTime.now());
                     return decripted;
                 } else {
-                    Facade.registerLogMessage(!save ? 8008 : 8016, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+                    this.isDecrypted = false;
+                    Facade.registerLogMessage(!save ? 8008 : 8016, Facade.getLoggedUser().getEmail(), this.newFileName, LocalDateTime.now());
                 }
             } else {
-                Facade.registerLogMessage(!save ? 8007 : 8015, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+                Facade.registerLogMessage(!save ? 8007 : 8015, Facade.getLoggedUser().getEmail(), this.newFileName, LocalDateTime.now());
                 throw new InvalidFileContentException("Arquivo " + path + " inválido ou corrompido.");
             }
             return null;
