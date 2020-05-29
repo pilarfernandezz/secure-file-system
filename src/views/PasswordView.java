@@ -185,7 +185,9 @@ public class PasswordView extends Frame implements ActionListener {
                     Facade.lockUser(this.email);
                     EmailView.showScreen();
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    //todo log
+                    JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                    System.exit(1);
                 }
             } else {
                 try {
@@ -200,9 +202,13 @@ public class PasswordView extends Frame implements ActionListener {
                     }
                     this.typedPw = null;
                 } catch (SQLException throwables) {
-                    throwables.printStackTrace();
+                    //todo log
+                    JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                    System.exit(1);
                 } catch (Exception exception) {
-                    exception.printStackTrace();
+                    //todo log
+                    lblAlert.setVisible(true);
+                    this.panel.repaint();
                 }
             }
         } else if(e.getSource() == btnCancel){
