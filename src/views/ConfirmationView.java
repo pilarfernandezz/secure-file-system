@@ -40,7 +40,7 @@ public class ConfirmationView extends Frame implements ActionListener {
     public ConfirmationView() throws InvalidExtractionCertificateOwnerInfoException, SQLException {
         super();
 
-        this.certInfo = Facade.getFacadeInstance().extractCertificate(certificatePath);
+        this.certInfo = Facade.extractCertificate(certificatePath);
 
         this.setBackground(Color.WHITE);
 
@@ -54,7 +54,7 @@ public class ConfirmationView extends Frame implements ActionListener {
         lblTotal.setBounds(280, -160, 800, 600);
         this.panel.add(lblTotal);
 
-        lblTotalQtd = new JLabel(String.valueOf(Facade.getFacadeInstance().getNumberOfUsersRegistered()));
+        lblTotalQtd = new JLabel(String.valueOf(Facade.getNumberOfUsersRegistered()));
         lblTotalQtd.setBounds(470, -160, 800, 600);
         this.panel.add(lblTotalQtd);
 
@@ -123,9 +123,9 @@ public class ConfirmationView extends Frame implements ActionListener {
             this.dispose();
             try {
                 if(register) {
-                    Facade.getFacadeInstance().registerUser(certificatePath, group, password, passwordConfirmation);
+                    Facade.registerUser(certificatePath, group, password, passwordConfirmation);
                 } else {
-                    Facade.getFacadeInstance().updateUser(certificatePath, password, passwordConfirmation);
+                    Facade.updateUser(certificatePath, password, passwordConfirmation);
                 }
                 MenuView.showScreen();
             } catch (SQLException throwables) {

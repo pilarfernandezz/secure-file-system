@@ -50,7 +50,7 @@ public class RegisterView extends Frame implements ActionListener {
         lblTotal.setBounds(280, -160, 800, 600);
         this.panel.add(lblTotal);
 
-        lblTotalQtd = new JLabel(String.valueOf(Facade.getFacadeInstance().getNumberOfUsersRegistered()));
+        lblTotalQtd = new JLabel(String.valueOf(Facade.getNumberOfUsersRegistered()));
         lblTotalQtd.setBounds(470, -160, 800, 600);
         this.panel.add(lblTotalQtd);
 
@@ -132,8 +132,8 @@ public class RegisterView extends Frame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnRegister) {
             try {
-                boolean invalidPw = password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+") || !Facade.getFacadeInstance().validatePassword(password.getText());
-                boolean invalidCert = certificatePath.getText().trim().equals("") || certificatePath.getText() == null || !Facade.getFacadeInstance().validateCertificate(certificatePath.getText());
+                boolean invalidPw = password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+") || !Facade.validatePassword(password.getText());
+                boolean invalidCert = certificatePath.getText().trim().equals("") || certificatePath.getText() == null || !Facade.validateCertificate(certificatePath.getText());
                 lblAlertPw.setVisible(invalidPw);
                 lblAlertCert.setVisible(invalidCert);
                 this.panel.repaint();
@@ -150,8 +150,10 @@ public class RegisterView extends Frame implements ActionListener {
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             } catch (FileNotFoundException fileNotFoundException) {
+                lblAlertCert.setVisible(true);
                 fileNotFoundException.printStackTrace();
             } catch (InvalidCertificateException invalidCertificateException) {
+                lblAlertCert.setVisible(true);
                 invalidCertificateException.printStackTrace();
             }
         } else if (e.getSource() == btnReturn) {

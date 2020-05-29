@@ -82,13 +82,18 @@ public class ConsultView extends FrameConsult implements ActionListener, MouseLi
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnConsult) {
+            this.lblAlert.setVisible(false);
+            this.tableView.setVisible(false);
+            this.panel.repaint();
+
             try {
-                Facade.getFacadeInstance().updateConsultNumber();
+                Facade.updateConsultNumber();
                 if(txtpath.getText()!= null && txtpath.getText().trim().length()>0){
-                    this.folderContent = Facade.getFacadeInstance().decryptFile(Facade.getFacadeInstance().getLoggedUser().getEmail(), txtpath.getText(),false, null);
+                    this.folderContent = Facade.decryptFile(Facade.getLoggedUser().getEmail(), txtpath.getText(),false, null);
                     tableView.setContent(this.folderContent);
                     tableView.setPath(txtpath.getText().substring(0,txtpath.getText().lastIndexOf("/")+1));
                     tableView.showInfo();
+                    tableView.setVisible(true);
                     this.panel.add(tableView);
                     this.panel.repaint();
                 } else {
@@ -96,11 +101,9 @@ public class ConsultView extends FrameConsult implements ActionListener, MouseLi
                     this.panel.repaint();
                 }
             } catch (Exception exc) {
-                try {
-                    throw exc;
-                } catch (Exception exception) {
-                    exception.printStackTrace();
-                }
+                this.lblAlert.setVisible(true);
+                this.tableView.setVisible(false);
+                this.panel.repaint();
             }
         } else if (e.getSource() == btnReturn) {
             this.setVisible(false);

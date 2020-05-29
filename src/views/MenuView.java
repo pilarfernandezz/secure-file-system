@@ -35,7 +35,7 @@ public class MenuView extends Frame implements ActionListener {
         this.panel.setBounds(0, 0, 800, 600);
         this.panel.add(lblTitle);
 
-        lblTotal = new JLabel("Total de acessos do usuário: " + Facade.getFacadeInstance().getLoggedUser().getTotalAccess());
+        lblTotal = new JLabel("Total de acessos do usuário: " + Facade.getLoggedUser().getTotalAccess());
         lblTotal.setBounds(280, -160, 800, 600);
         this.panel.add(lblTotal);
 
@@ -99,7 +99,6 @@ public class MenuView extends Frame implements ActionListener {
             } catch (SQLException | UnsupportedEncodingException throwables) {
                 throwables.printStackTrace();
             }
-            // TODO ADICIONAR CHAMADA DE TELA DE CONSULTA E DESCOMENTAR CODIGO ACIMA
         } else if (e.getSource() == btnExit){
             this.setVisible(false);
             this.dispose();

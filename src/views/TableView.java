@@ -31,7 +31,7 @@ public class TableView extends JPanel implements MouseListener {
     public void showInfo() throws UnsupportedEncodingException {
 
         int x = 0, y = 0;
-        this.index = Facade.getFacadeInstance().getIndexInfo(this.content);
+        this.index = Facade.getIndexInfo(this.content);
 
         this.table = new JLabel[index.length + 1][3];
 
@@ -87,8 +87,12 @@ public class TableView extends JPanel implements MouseListener {
                 }
             }
             try {
-                Facade.getFacadeInstance().decryptFile(Facade.getLoggedUser().getEmail(), path + "/" + nameEncoded, true, ((JLabel) e.getSource()).getText());
+                if(Facade.decryptFile(Facade.getLoggedUser().getEmail(), path + "/" + nameEncoded, true, ((JLabel) e.getSource()).getText()) != null){
+                    JOptionPane.showMessageDialog(null, "Arquivo " + ((JLabel) e.getSource()).getText() +" decriptado e salvo com sucesso.");
+                }
             } catch (Exception exception) {
+                JOptionPane.showMessageDialog(null, "Ocorreu um erro ao decriptar e salvar o arquivo " + ((JLabel) e.getSource()).getText() + ".");
+
                 exception.printStackTrace();
             }
         }

@@ -113,8 +113,8 @@ public class ChangePwView extends Frame implements ActionListener {
             lblAlertPw.setVisible(false);
 
             try {
-                boolean invalidPw = password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+") || !Facade.getFacadeInstance().validatePassword(password.getText());
-                boolean invalidCert = certificatePath.getText().trim().equals("") || certificatePath.getText() == null || !Facade.getFacadeInstance().validateCertificate(certificatePath.getText());
+                boolean invalidPw = password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+") || !Facade.validatePassword(password.getText());
+                boolean invalidCert = certificatePath.getText().trim().equals("") || certificatePath.getText() == null || !Facade.validateCertificate(certificatePath.getText());
                 lblAlertPw.setVisible(invalidPw);
                 lblAlertCert.setVisible(invalidCert);
                 this.panel.repaint();

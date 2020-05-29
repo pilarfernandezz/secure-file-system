@@ -23,6 +23,7 @@ public class PvtKeyView extends Frame implements ActionListener {
     private static JButton btnStart;
     private static JButton btnCancel;
     private static String email;
+    private static int keyErrors = 0;
 
     public PvtKeyView() throws SQLException {
         super();
@@ -90,17 +91,34 @@ public class PvtKeyView extends Frame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == btnStart){
+            lblAlert.setVisible(false);
+
             try {
-                if(txtPath.getText() == null || txtPath.getText().equals("") || !Facade.getFacadeInstance().keysValidation(this.email, txtPath.getText(),txtSecret.getText())){
-                    lblAlert.setVisible(true);
-                    this.panel.repaint();
-                } else{
-                    this.setVisible(false);
-                    this.dispose();
-                    Facade.getFacadeInstance().makeUserLogged(this.email, txtPath.getText(),txtSecret.getText());
-                    MenuView.showScreen();
+                if(this.keyErrors > 2){
+                    this.keyErrors=0;
+                    try {
+                        JOptionPane.showMessageDialog(null, "Usuário foi bloqueado por 2 minutos por exceder as tentativas de autenticação.");
+
+                        Facade.lockUser(this.email);
+                        EmailView.showScreen();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+                } else {
+                    if(txtPath.getText() == null || txtPath.getText().trim().equals("") || txtSecret.getText().trim().equals("") || txtSecret.getText() == null || !Facade.keysValidation(this.email, txtPath.getText(),txtSecret.getText())){
+                        lblAlert.setVisible(true);
+                        this.keyErrors++;
+                        this.panel.repaint();
+                    } else{
+                        this.setVisible(false);
+                        this.dispose();
+                        Facade.makeUserLogged(this.email, txtPath.getText(),txtSecret.getText());
+                        MenuView.showScreen();
+                    }
                 }
             } catch (Exception exception) {
+                lblAlert.setVisible(true);
+                this.keyErrors++;
                 exception.printStackTrace();
             }
         } else if(e.getSource() == btnCancel){

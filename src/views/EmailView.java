@@ -87,8 +87,8 @@ public class EmailView extends Frame implements ActionListener {
             lblAlert1.setVisible(false);
 
             try {
-                if(Facade.getFacadeInstance().checkEmail(this.txtEmail.getText())){
-                    if(Facade.getFacadeInstance().verifyIsLocked(this.txtEmail.getText())){
+                if(Facade.checkEmail(this.txtEmail.getText())){
+                    if(Facade.verifyIsLocked(this.txtEmail.getText())){
                         lblAlert1.setVisible(true);
                         this.panel.repaint();
                     } else {
