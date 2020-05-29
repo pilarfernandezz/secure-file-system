@@ -21,11 +21,14 @@ public class DigitalCertificateService {
         return instance;
     }
 
+    private DigitalCertificateService() {
+    }
+
     // recebe o caminho de um arquivo contendo um certificado
     // digital e retorna o seu conteudo como objeto X509Certificate
-    public X509Certificate loadCertificate(String cert,boolean isFile) throws FileNotFoundException, InvalidCertificateException {
+    public X509Certificate loadCertificate(String cert, boolean isFile) throws FileNotFoundException, InvalidCertificateException {
         try {
-            if(isFile) {
+            if (isFile) {
                 System.out.println(" load certificate " + cert);
                 return (X509Certificate) CertificateFactory.getInstance("X509")
                         .generateCertificate(new FileInputStream(new File(cert)));
@@ -33,7 +36,7 @@ public class DigitalCertificateService {
             return (X509Certificate) CertificateFactory.getInstance("X509")
                     .generateCertificate(new ByteArrayInputStream(cert.getBytes()));
         } catch (CertificateException | IOException e) {
-            throw new InvalidCertificateException("File doesn't match to valid X509 certificate. Please, check the information and try again.");
+            throw new InvalidCertificateException("Arquivo não compatível com certificado do tipo X509.");
         }
     }
 
@@ -41,7 +44,7 @@ public class DigitalCertificateService {
     // que contem as informacoes do dono do certificado
     public Map<String, String> extractCertificateOwnerInfo(String path, boolean isFile) throws InvalidExtractionCertificateOwnerInfoException {
         try {
-            X509Certificate certificate = this.loadCertificate(path,isFile);
+            X509Certificate certificate = this.loadCertificate(path, isFile);
             Principal owner = certificate.getSubjectDN();
             String[] ownerInfoArray = owner.getName().split(", ");
             Map<String, String> ownerInfo = new HashMap<>();
@@ -62,18 +65,11 @@ public class DigitalCertificateService {
                 }
             }
 
-            ownerInfo.put("CERTIFICATE",  this.getCertificate(path));
+            ownerInfo.put("CERTIFICATE", this.getCertificate(path));
 
             return ownerInfo;
         } catch (Exception e) {
-            throw new InvalidExtractionCertificateOwnerInfoException("An error was occurred while trying to extract certificate owner info. Please, check the information and try again.");
-        }
-    }
-
-    // exibe informacoes do dono do certificado
-    private void printCertificateOwnerInfo(Map<String, String> ownerInfo) {
-        for (String key : ownerInfo.keySet()) {
-            System.out.println(key + " - " + ownerInfo.get(key));
+            throw new InvalidExtractionCertificateOwnerInfoException("Ocorreu um erro ao tentar extrair dados do certificado.");
         }
     }
 
@@ -91,8 +87,8 @@ public class DigitalCertificateService {
 
             String[] text = textAll.split("-----BEGIN CERTIFICATE-----");
             return "-----BEGIN CERTIFICATE-----".concat(text[1]);
-        } catch (Exception e) {
-            throw e;
+        } catch (IOException e) {
+            throw new IOException("Ocorreu um erro ao obter o certificado formato PEM: " + e.getMessage());
         }
     }
 

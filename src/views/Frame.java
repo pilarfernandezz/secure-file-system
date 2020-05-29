@@ -2,28 +2,26 @@ package views;
 
 import facade.Facade;
 
-import java.awt.*;
-import java.sql.SQLException;
 import javax.swing.*;
+import java.awt.*;
 
-@SuppressWarnings("serial")
-public class Frame extends JFrame{
+public class Frame extends JFrame {
     protected JPanel panel = new JPanel();
     JLabel login;
     JLabel userGroup;
     JLabel name;
 
-    public Frame() throws SQLException {
+    public Frame() {
         this.setSize(800, 600);
         setLayout(null);
         this.setLocationRelativeTo(null);
         this.setBackground(Color.WHITE);
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setTitle("Secure File System");
+        this.setTitle("Sistema de arquivos seguro");
         this.panel.setBounds(0, 0, 1600, 950);
 
-        if(Facade.getLoggedUser()!= null) {
+        if (Facade.getLoggedUser() != null) {
             login = new JLabel(Facade.getLoggedUser().getEmail());
             login.setBounds(50, -250, 800, 600);
             this.login.setVisible(false);
@@ -45,7 +43,7 @@ public class Frame extends JFrame{
         this.getContentPane().add(panel);
     }
 
-    public void showHeader(){
+    public void showHeader() {
         this.login.setVisible(true);
         this.name.setVisible(true);
         this.userGroup.setVisible(true);

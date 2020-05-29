@@ -1,10 +1,7 @@
 package models;
 
-import services.DigitalCertificateService;
-
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 
 public class User {
     private int id;
@@ -25,7 +22,7 @@ public class User {
 
     public User(String password, String passwordConfirmation, String group, String certificatePath, int totalAccess, int totalConsults) {
         this.passwordConfirmation = passwordConfirmation;
-        this.password = password ;
+        this.password = password;
         this.group = group;
         this.certificatePath = certificatePath;
         this.allowed = true;

@@ -102,7 +102,9 @@ public class PvtKeyView extends Frame implements ActionListener {
                         Facade.lockUser(this.email);
                         EmailView.showScreen();
                     } catch (Exception exception) {
-                        exception.printStackTrace();
+                        //todo log
+                        JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                        System.exit(1);
                     }
                 } else {
                     if(txtPath.getText() == null || txtPath.getText().trim().equals("") || txtSecret.getText().trim().equals("") || txtSecret.getText() == null || !Facade.keysValidation(this.email, txtPath.getText(),txtSecret.getText())){
@@ -114,12 +116,13 @@ public class PvtKeyView extends Frame implements ActionListener {
                         this.dispose();
                         Facade.makeUserLogged(this.email, txtPath.getText(),txtSecret.getText());
                         MenuView.showScreen();
+                        //todo log
                     }
                 }
             } catch (Exception exception) {
                 lblAlert.setVisible(true);
                 this.keyErrors++;
-                exception.printStackTrace();
+                //todo log
             }
         } else if(e.getSource() == btnCancel){
             System.exit(1);

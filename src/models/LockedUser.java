@@ -8,17 +8,12 @@ public class LockedUser {
     private LocalDateTime lockDate;
     private boolean isActive;
 
-    public LockedUser(int id, int userId, LocalDateTime lockDate, boolean isActive){
+    public LockedUser(int id, int userId, LocalDateTime lockDate, boolean isActive) {
         this.id = id;
         this.userId = userId;
         this.lockDate = lockDate;
         this.isActive = isActive;
     }
-    public LockedUser(int userId, boolean isActive){
-        this.userId = userId;
-        this.isActive = isActive;
-    }
-
 
     public int getId() {
         return id;
@@ -51,5 +46,4 @@ public class LockedUser {
     public void setActive(boolean active) {
         isActive = active;
     }
-
 }

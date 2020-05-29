@@ -11,8 +11,7 @@ import java.awt.event.MouseListener;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 
-public class ConsultView extends FrameConsult implements ActionListener, MouseListener {
-    private static ConsultView instance;
+public class ConsultView extends FrameConsult implements ActionListener {
     private Font titleFont = new Font("Monospaced", Font.BOLD, 30);
     private JLabel lblTitle;
     private JLabel lblText;
@@ -21,7 +20,6 @@ public class ConsultView extends FrameConsult implements ActionListener, MouseLi
     private JTextField txtpath;
     private static JButton btnReturn;
     private static JButton btnConsult;
-    private int totalQtd = 0;
     private TableView tableView;
     private byte[] folderContent;
 
@@ -111,40 +109,18 @@ public class ConsultView extends FrameConsult implements ActionListener, MouseLi
             try {
                 MenuView.showScreen();
             } catch (SQLException throwables) {
-                throwables.printStackTrace();
+                //todo log
+                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                System.exit(1);
             } catch (Exception exception) {
-                exception.printStackTrace();
+                //todo log
+                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                System.exit(1);
             }
         }
     }
 
     public static void showScreen() throws SQLException, UnsupportedEncodingException {
         new ConsultView();
-    }
-
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-
     }
 }

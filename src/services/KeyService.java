@@ -9,7 +9,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -26,15 +25,18 @@ public class KeyService {
         return instance;
     }
 
+    private KeyService() {
+    }
+
     // recebe o caminho do arquivo que contem o certificado digital que
     // contem a chave publica, gera um objeto PublicKey e o retorna
-    public PublicKey loadPublicKey(X509Certificate cert) throws CertificateException, FileNotFoundException {
+    public PublicKey loadPublicKey(X509Certificate cert) {
         return cert.getPublicKey();
     }
 
     // recebe o caminho do arquivo que contem a chave
     // privada, gera um objeto PrivateKey e o retorna
-    public PrivateKey loadPrivateKey(String path, String secret) throws NoSuchPaddingException, NoSuchAlgorithmException, BadPaddingException, IllegalBlockSizeException, IOException, InvalidKeySpecException, InvalidKeyFileException {
+    public PrivateKey loadPrivateKey(String path, String secret) throws IOException, InvalidKeySpecException, InvalidKeyFileException, InvalidKeyException {
         byte[] buffer = null;
         try {
             FileInputStream file = new FileInputStream((new File(path)));
@@ -60,17 +62,19 @@ public class KeyService {
             byte[] keyDecriptedAndDecoded = Base64.getDecoder().decode(keyString);
             return KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(keyDecriptedAndDecoded));
         } catch (FileNotFoundException e) {
-            throw new FileNotFoundException("File " + path + " doesn't exists.");
+            throw new FileNotFoundException("Arquivo " + path + " não existe.");
         } catch (IOException e) {
-            throw new IOException("File " + path + " is invalid.");
+            throw new IOException("Arquivo " + path + " inválido.");
         } catch (InvalidKeyException e) {
-            throw new InvalidKeyFileException("File content doesn't match to a valid private key");
+            throw new InvalidKeyFileException("O conteúdo do arquivo não é compatível com um objeto chave privada");
         } catch (InvalidKeySpecException e) {
-            throw new InvalidKeySpecException("File content doesn't match to a valid PKCS8 RSA private key");
+            throw new InvalidKeySpecException("O conteúdo do arquivo não é compatível com um objeto chave privada formato PKCS8 RSA");
+        } catch (NoSuchPaddingException | NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException e) {
+            throw new InvalidKeyException("Chave privada não pode ser decriptada pois frase secreta não corresponde a chave.");
         }
     }
 
-    public boolean verifyKeyPairIntegrity(PublicKey publicKey, PrivateKey privateKey) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public boolean verifyKeyPairIntegrity(PublicKey publicKey, PrivateKey privateKey) throws InvalidKeyException {
         try {
             SecureRandom random = new SecureRandom();
             byte[] randomBytes = new byte[2048];
@@ -89,7 +93,9 @@ public class KeyService {
             signature.initVerify(publicKey);
             return signature.verify(signed);
         } catch (InvalidKeyException e) {
-            throw new InvalidKeyException("One or both keys are invalid.");
+            throw new InvalidKeyException("Uma ou ambas chaves inválidas.");
+        } catch (NoSuchAlgorithmException | SignatureException e) {
+            throw new InvalidKeyException("Chaves assimétricas incompatíveis.");
         }
     }
 }

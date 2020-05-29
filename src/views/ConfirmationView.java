@@ -86,16 +86,12 @@ public class ConfirmationView extends Frame implements ActionListener {
         lblValidUntil.setBounds(110, 315, 500, 20);
         this.panel.add(lblValidUntil);
 
-        lblGroup = new JLabel("Grupo: " + ConfirmationView.group);
-        lblGroup.setBounds(110, 340, 300, 20);
-        this.panel.add(lblGroup);
-
         lblValidUntil = new JLabel("Email: " + this.certInfo.get("EMAILADDRESS"));
-        lblValidUntil.setBounds(110, 365, 500, 20);
+        lblValidUntil.setBounds(110, 340, 500, 20);
         this.panel.add(lblValidUntil);
 
         lblGroup = new JLabel("Nome: " + this.certInfo.get("CN"));
-        lblGroup.setBounds(110, 390, 300, 20);
+        lblGroup.setBounds(110, 365, 500, 20);
         this.panel.add(lblGroup);
 
         btnRegister = new JButton("Registrar");
@@ -123,7 +119,7 @@ public class ConfirmationView extends Frame implements ActionListener {
             this.dispose();
             try {
                 if(register) {
-                    Facade.registerUser(certificatePath, group, password, passwordConfirmation);
+                    Facade.registerUser(certificatePath, group, password);
                 } else {
                     Facade.updateUser(certificatePath, password, passwordConfirmation);
                 }
