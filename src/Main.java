@@ -2,6 +2,7 @@ import facade.Facade;
 import services.AuthenticationService;
 import services.IndexService;
 import services.PasswordCipherService;
+import views.ChangePwView;
 import views.ConsultView;
 import views.EmailView;
 import views.PvtKeyView;
@@ -21,7 +22,7 @@ public class Main {
 //     //  new ConsultView();
         //   new EmailView();
         //new PvtKeyView();
-
+   // new ChangePwView();
 
         facade.start();
         //   new ConsultView();

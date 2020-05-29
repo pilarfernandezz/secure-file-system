@@ -176,6 +176,8 @@ public class PasswordView extends Frame implements ActionListener {
         }
 
         if(e.getSource() == btnStart){
+            lblAlert.setVisible(false);
+
             if(this.passwordErrors > 2){
                 this.passwordErrors=0;
                 try {

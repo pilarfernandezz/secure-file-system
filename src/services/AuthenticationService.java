@@ -273,4 +273,13 @@ public class AuthenticationService {
         X509Certificate cert = digitalCertificateService.loadCertificate(user.getCertificate(), false);
         return keyService.verifyKeyPairIntegrity(keyService.loadPublicKey(cert), keyService.loadPrivateKey(path, secret));
     }
+
+    public boolean validatePassword(String pw){
+        for(int i = 0; i < pw.length()-1;i++){
+            if(pw.charAt(i) == pw.charAt(i+1) || pw.charAt(i) == pw.charAt(i+1)+1 || pw.charAt(i) == pw.charAt(i+1)-1) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

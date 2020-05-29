@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.List;
 
 public class ChangePwView extends Frame implements ActionListener {
     private static ChangePwView instance;
@@ -17,6 +18,8 @@ public class ChangePwView extends Frame implements ActionListener {
     private JLabel lblPassword;
     private JLabel lblPasswordConfirmation;
     private JLabel lblTotal;
+    private JLabel lblAlertPw;
+    private JLabel lblAlertCert;
     private JLabel lblTotalQtd;
     private static JTextField certificatePath = null;
     private static JPasswordField password = null;
@@ -24,6 +27,7 @@ public class ChangePwView extends Frame implements ActionListener {
     private static JButton btnRegister;
     private static JButton btnReturn;
     private int totalQtd = 0;
+    private List<int[]> typedPw;
 
     public ChangePwView() throws SQLException {
         super();
@@ -72,13 +76,25 @@ public class ChangePwView extends Frame implements ActionListener {
         passwordConfirmation.setBounds(250, 300, 500, 30);
         this.panel.add(passwordConfirmation);
 
+        lblAlertCert = new JLabel("Certificado inválido");
+        lblAlertCert.setForeground(Color.red);
+        lblAlertCert.setBounds(60, 350, 700, 50);
+        this.panel.add(lblAlertCert);
+        lblAlertCert.setVisible(false);
+
+        lblAlertPw = new JLabel("Senha deve ter entre 6 e 8 caracteres numéricos e não pode conter sequências e repetições de caracteres");
+        lblAlertPw.setForeground(Color.red);
+        lblAlertPw.setBounds(60, 390, 700, 50);
+        this.panel.add(lblAlertPw);
+        lblAlertPw.setVisible(false);
+
         btnRegister = new JButton("Salvar");
-        btnRegister.setBounds(280, 360, 100, 40);
+        btnRegister.setBounds(280, 440, 100, 40);
         this.panel.add(btnRegister);
         btnRegister.addActionListener(this);
 
         btnReturn = new JButton("Voltar");
-        btnReturn.setBounds(390, 360, 100, 40);
+        btnReturn.setBounds(390, 440, 100, 40);
         this.panel.add(btnReturn);
         btnReturn.addActionListener(this);
 
@@ -89,26 +105,29 @@ public class ChangePwView extends Frame implements ActionListener {
         this.showHeader();
         this.setVisible(true);
     }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        /* verifica botão clicado*/
-        if(e.getSource() == btnRegister){
-            this.setVisible(false);
-            this.dispose();
-            try {
-                Facade.getFacadeInstance().updateUser(certificatePath.getText(), password.getText(), passwordConfirmation.getText());
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
-            try {
-                MenuView.showScreen();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
+        if (e.getSource() == btnRegister) {
+            lblAlertCert.setVisible(false);
+            lblAlertPw.setVisible(false);
 
-        } else if(e.getSource() == btnReturn) {
+            try {
+                boolean invalidPw = password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+") || !Facade.getFacadeInstance().validatePassword(password.getText());
+                boolean invalidCert = certificatePath.getText().trim().equals("") || certificatePath.getText() == null || !Facade.getFacadeInstance().validateCertificate(certificatePath.getText());
+                lblAlertPw.setVisible(invalidPw);
+                lblAlertCert.setVisible(invalidCert);
+                this.panel.repaint();
+
+                if (!invalidCert && !invalidPw) {
+                    this.setVisible(false);
+                    this.dispose();
+                    ConfirmationView.showScreen(false, certificatePath.getText(), null, password.getText(), passwordConfirmation.getText());
+                }
+            } catch (Exception exception) {
+                exception.printStackTrace();
+            }
+        } else if (e.getSource() == btnReturn) {
             this.setVisible(false);
             this.dispose();
             try {

@@ -94,4 +94,12 @@ public class Facade {
     public static boolean keysValidation(String email, String path, String secret) throws Exception {
         return AuthenticationService.getAuthenticationInstance().keysValidation(email, path, secret);
     }
+
+    public static boolean validatePassword (String pw) throws SQLException {
+        return AuthenticationService.getAuthenticationInstance().validatePassword(pw);
+    }
+
+    public static boolean validateCertificate (String path) throws SQLException, FileNotFoundException, InvalidCertificateException {
+        return DigitalCertificateService.getInstance().loadCertificate(path,true) != null? true:false;
+    }
 }

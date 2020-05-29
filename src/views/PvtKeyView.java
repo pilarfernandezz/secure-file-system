@@ -43,7 +43,8 @@ public class PvtKeyView extends Frame implements ActionListener {
         lblPath.setBounds(150, 150, 300, 50);
         this.panel.add(lblPath);
 
-        txtPath = new JTextField();
+        //TODO TIRAR PVT KEY
+        txtPath = new JTextField("Keys/user01-pkcs8-des.key");
         txtPath.setBounds(360, 160, 200, 30);
         this.panel.add(txtPath);
 
@@ -57,7 +58,8 @@ public class PvtKeyView extends Frame implements ActionListener {
         lblSecret.setBounds(150, 190, 300, 50);
         this.panel.add(lblSecret);
 
-        txtSecret = new JPasswordField();
+        //TODO TIRAR USER01
+        txtSecret = new JPasswordField("user01");
         txtSecret.setBounds(360, 200, 200, 30);
         this.panel.add(txtSecret);
 

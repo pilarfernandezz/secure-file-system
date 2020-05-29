@@ -1,5 +1,6 @@
 package views;
 
+import exceptions.InvalidCertificateException;
 import exceptions.InvalidExtractionCertificateOwnerInfoException;
 import facade.Facade;
 
@@ -7,6 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
 
 public class RegisterView extends Frame implements ActionListener {
@@ -18,7 +20,8 @@ public class RegisterView extends Frame implements ActionListener {
     private JLabel lblGroup;
     private JLabel lblPassword;
     private JLabel lblPasswordConfirmation;
-    private JLabel lblAlert;
+    private JLabel lblAlertPw;
+    private JLabel lblAlertCert;
     private JLabel lblTotal;
     private JLabel lblTotalQtd;
     private static JRadioButton btnadministrator;
@@ -30,7 +33,7 @@ public class RegisterView extends Frame implements ActionListener {
     private static JPasswordField passwordConfirmation = null;
     private static JButton btnRegister;
     private static JButton btnReturn;
-    private int totalQtd =0;
+    private int totalQtd = 0;
 
     public RegisterView() throws SQLException {
         super();
@@ -59,7 +62,8 @@ public class RegisterView extends Frame implements ActionListener {
         lblCertificate.setBounds(50, 190, 300, 50);
         this.panel.add(lblCertificate);
 
-        certificatePath = new JTextField();
+        //TODO TIRAR CERTIFICADO
+        certificatePath = new JTextField("Keys/user01-x509.crt");
         certificatePath.setBounds(250, 200, 500, 30);
         this.panel.add(certificatePath);
 
@@ -68,12 +72,14 @@ public class RegisterView extends Frame implements ActionListener {
         this.panel.add(lblGroup);
 
         btnadministrator = new JRadioButton("Administrador");
-        btnadministrator.setBounds(250, 250,150,30);
+        btnadministrator.setBounds(250, 250, 150, 30);
         btnuser = new JRadioButton("Usuário");
-        btnuser.setBounds(400, 250,100,30);
+        btnuser.setBounds(400, 250, 100, 30);
         btngroup = new ButtonGroup();
-        btngroup.add(btnadministrator); btngroup.add(btnuser);
-        this.panel.add(btnuser); this.panel.add(btnadministrator);
+        btngroup.add(btnadministrator);
+        btngroup.add(btnuser);
+        this.panel.add(btnuser);
+        this.panel.add(btnadministrator);
 
         lblPassword = new JLabel("Senha númerica:");
         lblPassword.setBounds(50, 290, 300, 50);
@@ -91,19 +97,25 @@ public class RegisterView extends Frame implements ActionListener {
         passwordConfirmation.setBounds(250, 350, 500, 30);
         this.panel.add(passwordConfirmation);
 
-        lblAlert = new JLabel("Senha deve ter entre 6 e 8 caracteres numéricos e não pode conter sequências e repetições de caracteres");
-        lblAlert.setForeground(Color.red);
-        lblAlert.setBounds(60, 390, 700, 50);
-        this.panel.add(lblAlert);
-        lblAlert.setVisible(false);
+        lblAlertCert = new JLabel("Certificado inválido");
+        lblAlertCert.setForeground(Color.red);
+        lblAlertCert.setBounds(60, 430, 700, 50);
+        this.panel.add(lblAlertCert);
+        lblAlertCert.setVisible(false);
+
+        lblAlertPw = new JLabel("Senha deve ter entre 6 e 8 caracteres numéricos e não pode conter sequências e repetições de caracteres");
+        lblAlertPw.setForeground(Color.red);
+        lblAlertPw.setBounds(60, 390, 700, 50);
+        this.panel.add(lblAlertPw);
+        lblAlertPw.setVisible(false);
 
         btnRegister = new JButton("Registrar");
-        btnRegister.setBounds(280, 450, 100, 40);
+        btnRegister.setBounds(280, 470, 100, 40);
         this.panel.add(btnRegister);
         btnRegister.addActionListener(this);
 
         btnReturn = new JButton("Voltar");
-        btnReturn.setBounds(390, 450, 100, 40);
+        btnReturn.setBounds(390, 470, 100, 40);
         this.panel.add(btnReturn);
         btnReturn.addActionListener(this);
 
@@ -115,36 +127,34 @@ public class RegisterView extends Frame implements ActionListener {
         this.setVisible(true);
     }
 
-    public boolean validatePassword(String pw){
-        for(int i = 0; i < pw.length()-1;i++){
-            System.out.println(pw.length()-1 + " " + i + " " + pw.charAt(i) + " " + pw.charAt(i+1));
-            if(pw.charAt(i) == pw.charAt(i+1) || pw.charAt(i) == pw.charAt(i+1)+1 || pw.charAt(i) == pw.charAt(i+1)-1) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == btnRegister){
-            if(password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+" )|| !this.validatePassword(password.getText())){
-                lblAlert.setVisible(true);
+        if (e.getSource() == btnRegister) {
+            try {
+                boolean invalidPw = password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+") || !Facade.getFacadeInstance().validatePassword(password.getText());
+                boolean invalidCert = certificatePath.getText().trim().equals("") || certificatePath.getText() == null || !Facade.getFacadeInstance().validateCertificate(certificatePath.getText());
+                lblAlertPw.setVisible(invalidPw);
+                lblAlertCert.setVisible(invalidCert);
                 this.panel.repaint();
-            } else {
-                this.setVisible(false);
-                this.dispose();
-                try {
-                    if(btnuser.isSelected())
-                        RegisterConfirmationView.showScreen(certificatePath.getText(), "Usuário", password.getText(), passwordConfirmation.getText());
-                    else
-                        RegisterConfirmationView.showScreen(certificatePath.getText(), "Administrador", password.getText(), passwordConfirmation.getText());
 
-                } catch (InvalidExtractionCertificateOwnerInfoException | SQLException invalidExtractionCertificateOwnerInfoException) {
-                    invalidExtractionCertificateOwnerInfoException.printStackTrace();
+                if (!invalidCert && !invalidPw) {
+                    this.setVisible(false);
+                    this.dispose();
+                    try {
+                        ConfirmationView.showScreen(true,certificatePath.getText(), (btnuser.isSelected() ? "Usuário" : "Administrador"), password.getText(), passwordConfirmation.getText());
+                    } catch (InvalidExtractionCertificateOwnerInfoException | SQLException invalidExtractionCertificateOwnerInfoException) {
+                        invalidExtractionCertificateOwnerInfoException.printStackTrace();
+                    }
                 }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            } catch (FileNotFoundException fileNotFoundException) {
+                fileNotFoundException.printStackTrace();
+            } catch (InvalidCertificateException invalidCertificateException) {
+                invalidCertificateException.printStackTrace();
             }
-        } else if(e.getSource() == btnReturn){
+        } else if (e.getSource() == btnReturn) {
             this.setVisible(false);
             this.dispose();
             try {
