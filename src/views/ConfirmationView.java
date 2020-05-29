@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 public class ConfirmationView extends Frame implements ActionListener {
@@ -17,14 +18,11 @@ public class ConfirmationView extends Frame implements ActionListener {
     private static String passwordConfirmation;
     private static String certificatePath;
     private static String group;
-    private JLabel lblPassword;
     private JLabel lblCertificate;
-    private JLabel lblGroup;
+    private JLabel lblEmailAddress;
     private JLabel lblTitle;
     private JLabel lblText;
     private JLabel lblTotal;
-    private JLabel lblEmail;
-    private JLabel lblName;
     private JLabel lblTotalQtd;
     private Map<String, String> certInfo;
     private JLabel lblVersion;
@@ -35,7 +33,7 @@ public class ConfirmationView extends Frame implements ActionListener {
     private static JButton btnRegister;
     private static JButton btnReturn;
     private static boolean register;
-    private int totalQtd =0;
+    private int totalQtd = 0;
 
     public ConfirmationView() throws InvalidExtractionCertificateOwnerInfoException, SQLException {
         super();
@@ -62,23 +60,23 @@ public class ConfirmationView extends Frame implements ActionListener {
         lblText.setBounds(300, -120, 800, 600);
         this.panel.add(lblText);
 
-        lblCertificate = new JLabel("Caminho do certificado digital: " + ConfirmationView.certificatePath );
+        lblCertificate = new JLabel("Caminho do certificado digital: " + ConfirmationView.certificatePath);
         lblCertificate.setBounds(110, 215, 500, 20);
         this.panel.add(lblCertificate);
 
-        lblSerie = new JLabel("Serie: " + this.certInfo.get("SERIE") );
+        lblSerie = new JLabel("Serie: " + this.certInfo.get("SERIE"));
         lblSerie.setBounds(110, 215, 500, 20);
         this.panel.add(lblSerie);
 
-        lblIssuer = new JLabel("Emissor: " + this.certInfo.get("ISSUER") );
-        lblSerie.setBounds(110, 240, 500, 20);
-        this.panel.add(lblSerie);
+        lblIssuer = new JLabel("Emissor: " + this.certInfo.get("ISSUER"));
+        lblIssuer.setBounds(110, 240, 500, 20);
+        this.panel.add(lblIssuer);
 
-        lblSignType = new JLabel("Tipo assinatura: " + this.certInfo.get("SIGNATURETYPE") );
+        lblSignType = new JLabel("Tipo assinatura: " + this.certInfo.get("SIGNATURETYPE"));
         lblSignType.setBounds(110, 265, 500, 20);
         this.panel.add(lblSignType);
 
-        lblVersion = new JLabel("Versão: " + this.certInfo.get("VERSION") );
+        lblVersion = new JLabel("Versão: " + this.certInfo.get("VERSION"));
         lblVersion.setBounds(110, 290, 500, 20);
         this.panel.add(lblVersion);
 
@@ -86,13 +84,9 @@ public class ConfirmationView extends Frame implements ActionListener {
         lblValidUntil.setBounds(110, 315, 500, 20);
         this.panel.add(lblValidUntil);
 
-        lblValidUntil = new JLabel("Email: " + this.certInfo.get("EMAILADDRESS"));
-        lblValidUntil.setBounds(110, 340, 500, 20);
-        this.panel.add(lblValidUntil);
-
-        lblGroup = new JLabel("Nome: " + this.certInfo.get("CN"));
-        lblGroup.setBounds(110, 365, 500, 20);
-        this.panel.add(lblGroup);
+        lblEmailAddress = new JLabel("Email: " + this.certInfo.get("EMAILADDRESS"));
+        lblEmailAddress.setBounds(110, 340, 500, 20);
+        this.panel.add(lblEmailAddress);
 
         btnRegister = new JButton("Registrar");
         btnRegister.setBounds(280, 450, 100, 40);
@@ -114,11 +108,12 @@ public class ConfirmationView extends Frame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == btnRegister){
+        if (e.getSource() == btnRegister) {
+            Facade.registerLogMessage(register ? 6005 : 7004, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
             this.setVisible(false);
             this.dispose();
             try {
-                if(register) {
+                if (register) {
                     Facade.registerUser(certificatePath, group, password);
                 } else {
                     Facade.updateUser(certificatePath, password, passwordConfirmation);
@@ -129,7 +124,8 @@ public class ConfirmationView extends Frame implements ActionListener {
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
-        } else if(e.getSource() == btnReturn){
+        } else if (e.getSource() == btnReturn) {
+            Facade.registerLogMessage(register ? 6006 : 7005, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
             this.setVisible(false);
             this.dispose();
             try {
@@ -140,7 +136,7 @@ public class ConfirmationView extends Frame implements ActionListener {
         }
     }
 
-    public static void showScreen(boolean register,String certificatePath,String group, String password, String passwordConfirmation) throws InvalidExtractionCertificateOwnerInfoException, SQLException {
+    public static void showScreen(boolean register, String certificatePath, String group, String password, String passwordConfirmation) throws InvalidExtractionCertificateOwnerInfoException, SQLException {
         ConfirmationView.register = register;
         ConfirmationView.certificatePath = certificatePath;
         ConfirmationView.group = group;

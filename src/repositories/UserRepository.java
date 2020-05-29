@@ -1,10 +1,7 @@
 package repositories;
 
-import exceptions.InvalidCertificateException;
 import models.User;
-import services.DigitalCertificateService;
 
-import java.io.FileNotFoundException;
 import java.sql.*;
 
 public class UserRepository {
@@ -17,24 +14,24 @@ public class UserRepository {
         return instance;
     }
 
-    private UserRepository() throws SQLException {
-        try{
+    private UserRepository() {
+        try {
             this.conn = DriverManager.getConnection("jdbc:mysql://root@localhost/secure_file_system");
-        } catch (SQLException e){
+        } catch (SQLException e) {
             System.out.println("Ocorreu um erro ao conectar com o banco: \n" + e.getMessage());
         }
     }
 
     // Retorna a quantidade de usuários cadastrados no banco na tabela users
     public int countUsers() {
-        try{
+        try {
             String query = "select count(*) from users;";
             ResultSet res = this.conn.createStatement().executeQuery(query);
             if (res.next()) {
                 return res.getInt("count(*)");
             }
             return 0;
-        } catch (SQLException e){
+        } catch (SQLException e) {
             System.out.println("Ocorreu um erro ao contar número de usuários cadastrados no banco: \n" + e.getMessage());
             return 0;
         }
@@ -48,7 +45,7 @@ public class UserRepository {
             ps.setInt(1, totalAccess);
             ps.setInt(2, id);
             ps.execute();
-        } catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println("Ocorreu um erro ao atualizar o total de acessos do usuario: \n" + e.getMessage());
         }
     }
@@ -61,7 +58,7 @@ public class UserRepository {
             ps.setInt(1, totalConsults);
             ps.setInt(2, id);
             ps.execute();
-        } catch(SQLException e){
+        } catch (SQLException e) {
             System.out.println("Ocorreu um erro ao atualizar o total de consultas do usuario: \n" + e.getMessage());
         }
     }

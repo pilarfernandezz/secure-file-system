@@ -3,15 +3,13 @@ package facade;
 import exceptions.InvalidCertificateException;
 import exceptions.InvalidExtractionCertificateOwnerInfoException;
 import models.User;
-import services.AuthenticationService;
-import services.CipherService;
-import services.DigitalCertificateService;
-import services.IndexService;
+import services.*;
 import views.EmailView;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -87,5 +85,9 @@ public class Facade {
 
     public static boolean validateCertificate(String path) throws FileNotFoundException, InvalidCertificateException {
         return DigitalCertificateService.getInstance().loadCertificate(path, true) != null ? true : false;
+    }
+
+    public static void registerLogMessage(int code, String login, String arq, LocalDateTime creationDatetime){
+        LogService.getInstance().registerLogMessage(code, login, arq, creationDatetime);
     }
 }

@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 public class ConsultView extends FrameConsult implements ActionListener {
     private Font titleFont = new Font("Monospaced", Font.BOLD, 30);
@@ -77,24 +78,34 @@ public class ConsultView extends FrameConsult implements ActionListener {
         this.setVisible(true);
     }
 
+    public static void showScreen() throws SQLException, UnsupportedEncodingException {
+        Facade.registerLogMessage(8001, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+        new ConsultView();
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnConsult) {
+            Facade.registerLogMessage(8003, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
             this.lblAlert.setVisible(false);
             this.tableView.setVisible(false);
             this.panel.repaint();
 
             try {
                 Facade.updateConsultNumber();
-                if(txtpath.getText()!= null && txtpath.getText().trim().length()>0){
-                    this.folderContent = Facade.decryptFile(Facade.getLoggedUser().getEmail(), txtpath.getText(),false, null);
-                    tableView.setContent(this.folderContent);
-                    tableView.setPath(txtpath.getText().substring(0,txtpath.getText().lastIndexOf("/")+1));
-                    tableView.showInfo();
-                    tableView.setVisible(true);
-                    this.panel.add(tableView);
-                    this.panel.repaint();
+                if (txtpath.getText() != null && txtpath.getText().trim().length() > 0) {
+                    this.folderContent = Facade.decryptFile(Facade.getLoggedUser().getEmail(), txtpath.getText(), false, null);
+                    if (folderContent != null) {
+                        tableView.setContent(this.folderContent);
+                        tableView.setPath(txtpath.getText().substring(0, txtpath.getText().lastIndexOf("/") + 1));
+                        tableView.showInfo();
+                        Facade.registerLogMessage(8009, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+                        tableView.setVisible(true);
+                        this.panel.add(tableView);
+                        this.panel.repaint();
+                    }
                 } else {
+                    Facade.registerLogMessage(8004, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
                     this.lblAlert.setVisible(true);
                     this.panel.repaint();
                 }
@@ -104,23 +115,20 @@ public class ConsultView extends FrameConsult implements ActionListener {
                 this.panel.repaint();
             }
         } else if (e.getSource() == btnReturn) {
+            Facade.registerLogMessage(8002, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
             this.setVisible(false);
             this.dispose();
             try {
                 MenuView.showScreen();
             } catch (SQLException throwables) {
-                //todo log
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
                 System.exit(1);
             } catch (Exception exception) {
-                //todo log
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
                 System.exit(1);
             }
         }
-    }
-
-    public static void showScreen() throws SQLException, UnsupportedEncodingException {
-        new ConsultView();
     }
 }

@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 public class MenuView extends Frame implements ActionListener {
     private Font titleFont = new Font("Monospaced", Font.BOLD, 30);
@@ -71,46 +72,53 @@ public class MenuView extends Frame implements ActionListener {
         this.setVisible(true);
     }
 
+    public static void showScreen() throws Exception {
+        Facade.registerLogMessage(5001, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+        new MenuView();
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == btnRegister){
 			this.setVisible(false);
 			this.dispose();
             try {
+                Facade.registerLogMessage(5002, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
                 RegisterView.showScreen();
             } catch (SQLException throwables) {
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
                 System.exit(1);
             }
         } else if (e.getSource() == btnChange){
             this.setVisible(false);
             this.dispose();
             try {
+                Facade.registerLogMessage(5003, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
                 ChangePwView.showScreen();
             } catch (SQLException throwables) {
-                //todo log
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
                 System.exit(1);
             }
         } else if (e.getSource() == btnConsult){
             this.setVisible(false);
             this.dispose();
             try {
+                Facade.registerLogMessage(5004, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
                 ConsultView.showScreen();
             } catch (SQLException | UnsupportedEncodingException throwables) {
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
                 System.exit(1);
             }
         } else if (e.getSource() == btnExit){
             this.setVisible(false);
             this.dispose();
-            try {
-                ExitView.showScreen();
-            } catch (SQLException throwables) {
-                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
-                System.exit(1);
-            }
+            Facade.registerLogMessage(5005, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+            ExitView.showScreen();
         } else {
+            Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
             System.exit(1);
         }
     }
@@ -119,9 +127,5 @@ public class MenuView extends Frame implements ActionListener {
         User user = AuthenticationService.getInstance().getLoggedUser();
         if(user.getGroup().equals("Administrador")) return true;
         return false;
-    }
-
-    public static void showScreen() throws Exception {
-        new MenuView();
     }
 }
