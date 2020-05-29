@@ -8,7 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 public class MenuView extends Frame implements ActionListener {
@@ -81,14 +80,8 @@ public class MenuView extends Frame implements ActionListener {
         if (e.getSource() == btnRegister) {
             this.setVisible(false);
             this.dispose();
-            try {
-                Facade.registerLogMessage(5002, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
-                RegisterView.showScreen(null, null, null, null);
-            } catch (SQLException throwables) {
-                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
-                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
-                System.exit(1);
-            }
+            Facade.registerLogMessage(5002, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+            RegisterView.showScreen(null, null, null, null);
         } else if (e.getSource() == btnChange) {
             this.setVisible(false);
             this.dispose();

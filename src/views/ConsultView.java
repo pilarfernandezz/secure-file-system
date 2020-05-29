@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 public class ConsultView extends FrameConsult implements ActionListener {
@@ -117,10 +116,6 @@ public class ConsultView extends FrameConsult implements ActionListener {
             this.dispose();
             try {
                 MenuView.showScreen();
-            } catch (SQLException throwables) {
-                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
-                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
-                System.exit(1);
             } catch (Exception exception) {
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
                 Facade.registerLogMessage(1002, null, null, LocalDateTime.now());

@@ -9,7 +9,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 public class RegisterView extends Frame implements ActionListener {
@@ -154,10 +153,6 @@ public class RegisterView extends Frame implements ActionListener {
                         ConfirmationView.showScreen(true, certificatePath.getText(), (btnuser.isSelected() ? "Usuário" : "Administrador"), password.getText(), passwordConfirmation.getText());
                     } catch (InvalidExtractionCertificateOwnerInfoException ex) {
                         lblAlertCert.setVisible(true);
-                    } catch (SQLException invalidExtractionCertificateOwnerInfoException) {
-                        JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
-                        Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
-                        System.exit(1);
                     }
                 } else {
                     Facade.registerLogMessage(invalidPw ? 6003 : 6004, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
