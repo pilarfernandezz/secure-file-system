@@ -1,11 +1,15 @@
 package views;
 
+import exceptions.InvalidDecryptFileException;
 import facade.Facade;
 
+import javax.crypto.NoSuchPaddingException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 
 public class TableView extends JPanel implements MouseListener {
@@ -96,8 +100,10 @@ public class TableView extends JPanel implements MouseListener {
                 if (nameEncoded != null && Facade.decryptFile(Facade.getLoggedUser().getEmail(), path + "/" + nameEncoded, true, ((JLabel) e.getSource()).getText()) != null) {
                     JOptionPane.showMessageDialog(null, "Arquivo " + ((JLabel) e.getSource()).getText() + " decriptado e salvo com sucesso.");
                 }
-            } catch (Exception exception) {
+            } catch (InvalidDecryptFileException | NoSuchPaddingException | NoSuchAlgorithmException ex) {
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro ao decriptar e salvar o arquivo " + ((JLabel) e.getSource()).getText() + ".");
+            } catch (InvalidKeyException ex) {
+                JOptionPane.showMessageDialog(null, "Arquivo " + ((JLabel) e.getSource()).getText() + " está corrompido e não pode ser salvo.");
             }
         }
     }

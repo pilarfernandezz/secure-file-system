@@ -184,6 +184,8 @@ public class PasswordView extends Frame implements ActionListener {
                     JOptionPane.showMessageDialog(null, "Usuário foi bloqueado por 2 minutos por exceder as tentativas de autenticação.");
                     Facade.lockUser(this.email);
                     Facade.registerLogMessage(3007, email, null, LocalDateTime.now());
+                    Facade.registerLogMessage(3002, email, null, LocalDateTime.now());
+
                     EmailView.showScreen();
                 } catch (Exception exception) {
                     JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");

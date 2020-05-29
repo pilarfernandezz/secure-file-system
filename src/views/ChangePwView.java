@@ -82,7 +82,7 @@ public class ChangePwView extends Frame implements ActionListener {
         this.panel.add(lblAlertCert);
         lblAlertCert.setVisible(false);
 
-        lblAlertPw = new JLabel("Senha deve ter entre 6 e 8 caracteres numéricos e não pode conter sequências e repetições de caracteres");
+        lblAlertPw = new JLabel();
         lblAlertPw.setForeground(Color.red);
         lblAlertPw.setBounds(60, 390, 700, 50);
         this.panel.add(lblAlertPw);
@@ -122,17 +122,24 @@ public class ChangePwView extends Frame implements ActionListener {
                 lblAlertCert.setVisible(false);
                 lblAlertPw.setVisible(false);
 
-                boolean invalidPw = password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+") || !Facade.validatePassword(password.getText());
-                boolean invalidCert = certificatePath.getText().trim().equals("") || certificatePath.getText() == null || !Facade.validateCertificate(certificatePath.getText());
-                lblAlertPw.setVisible(invalidPw);
-                lblAlertCert.setVisible(invalidCert);
-                this.panel.repaint();
+                if (!passwordConfirmation.getText().equals(password.getText())) {
+                    this.lblAlertPw.setText("Senhas não coincidem");
+                    this.lblAlertPw.setVisible(true);
+                    this.panel.repaint();
+                } else {
+                    boolean invalidPw = password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+") || !Facade.validatePassword(password.getText(), passwordConfirmation.getText());
+                    boolean invalidCert = certificatePath.getText().trim().equals("") || certificatePath.getText() == null || !Facade.validateCertificate(certificatePath.getText());
+                    lblAlertPw.setText("Senha deve ter entre 6 e 8 caracteres numéricos e não pode conter sequências e repetições de caracteres");
+                    lblAlertPw.setVisible(invalidPw);
+                    lblAlertCert.setVisible(invalidCert);
+                    this.panel.repaint();
 
-                if (!invalidCert || !invalidPw) {
-                    Facade.registerLogMessage(invalidPw ? 7002 : 7003, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
-                    this.setVisible(false);
-                    this.dispose();
-                    ConfirmationView.showScreen(false, certificatePath.getText(), null, password.getText(), passwordConfirmation.getText());
+                    if (!invalidCert && !invalidPw) {
+                        Facade.registerLogMessage(invalidPw ? 7002 : 7003, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+                        this.setVisible(false);
+                        this.dispose();
+                        ConfirmationView.showScreen(false, certificatePath.getText(), null, password.getText(), passwordConfirmation.getText());
+                    }
                 }
             } catch (FileNotFoundException | InvalidCertificateException | InvalidExtractionCertificateOwnerInfoException ex) {
                 lblAlertCert.setVisible(true);

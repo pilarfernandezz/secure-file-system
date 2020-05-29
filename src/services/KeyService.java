@@ -74,7 +74,7 @@ public class KeyService {
         }
     }
 
-    public boolean verifyKeyPairIntegrity(PublicKey publicKey, PrivateKey privateKey) throws InvalidKeyException {
+    public int verifyKeyPairIntegrity(PublicKey publicKey, PrivateKey privateKey) throws InvalidKeyException {
         try {
             SecureRandom random = new SecureRandom();
             byte[] randomBytes = new byte[2048];
@@ -91,11 +91,11 @@ public class KeyService {
             }
             byte[] signed = signature.sign();
             signature.initVerify(publicKey);
-            return signature.verify(signed);
+            return signature.verify(signed) ? 0 : 4006;
         } catch (InvalidKeyException e) {
-            throw new InvalidKeyException("Uma ou ambas chaves inválidas.");
+            throw new InvalidKeyException("4005 - Uma ou ambas chaves inválidas.");
         } catch (NoSuchAlgorithmException | SignatureException e) {
-            throw new InvalidKeyException("Chaves assimétricas incompatíveis.");
+            throw new InvalidKeyException("4005 - Chaves assimétricas incompatíveis.");
         }
     }
 }

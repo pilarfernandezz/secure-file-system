@@ -97,6 +97,8 @@ public class PvtKeyView extends Frame implements ActionListener {
 
                         Facade.lockUser(this.email);
                         Facade.registerLogMessage(4007, email, null, LocalDateTime.now());
+                        Facade.registerLogMessage(4002, email, null, LocalDateTime.now());
+
                         EmailView.showScreen();
                     } catch (Exception exception) {
                         JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
@@ -106,9 +108,10 @@ public class PvtKeyView extends Frame implements ActionListener {
                 } else {
                     boolean invalidPath = txtPath.getText() == null || txtPath.getText().trim().equals("");
                     boolean invalidSecret = txtSecret.getText().trim().equals("") || txtSecret.getText() == null;
-                    boolean invalidKeys = !Facade.keysValidation(this.email, txtPath.getText(), txtSecret.getText());
-                    if (invalidPath || invalidSecret || invalidKeys) {
-                        Facade.registerLogMessage(invalidPath ? 4004 : (invalidSecret ? 4005 : 4006), email, null, LocalDateTime.now());
+                    int invalidKeys = Facade.keysValidation(this.email, txtPath.getText(), txtSecret.getText());
+
+                    if (invalidPath || invalidSecret || invalidKeys != 0) {
+                        Facade.registerLogMessage(invalidPath ? 4004 : invalidKeys, email, null, LocalDateTime.now());
                         lblAlert.setVisible(true);
                         this.keyErrors++;
                         this.panel.repaint();

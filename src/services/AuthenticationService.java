@@ -282,21 +282,21 @@ public class AuthenticationService {
         }
     }
 
-    public boolean keysValidation(String email, String path, String secret) {
+    public int keysValidation(String email, String path, String secret) {
         try {
             User user = this.findUser(email);
             X509Certificate cert = getInstance.loadCertificate(user.getCertificate(), false);
             return keyService.verifyKeyPairIntegrity(keyService.loadPublicKey(cert), keyService.loadPrivateKey(path, secret));
         } catch (Exception e) {
             System.out.println("Ocorreu um erro ao validar a chave privadas do usuário: " + e.getMessage());
-            return false;
+            return Integer.parseInt(e.getMessage().substring(0, 4));
         }
     }
 
     // Verifica se a senha tem entre tem entre 6 e 8 caracteres alfa numéricos, como especificado
-    public boolean validatePassword(String pw) {
+    public boolean validatePassword(String pw, String pwConf) {
         for (int i = 0; i < pw.length() - 1; i++) {
-            if (pw.charAt(i) == pw.charAt(i + 1) || pw.charAt(i) == pw.charAt(i + 1) + 1 || pw.charAt(i) == pw.charAt(i + 1) - 1) {
+            if (!pw.equals(pwConf) || pw.charAt(i) == pw.charAt(i + 1) || pw.charAt(i) == pw.charAt(i + 1) + 1 || pw.charAt(i) == pw.charAt(i + 1) - 1) {
                 return false;
             }
         }
