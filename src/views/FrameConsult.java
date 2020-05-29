@@ -4,23 +4,21 @@ import facade.Facade;
 
 import javax.swing.*;
 import java.awt.*;
-import java.sql.SQLException;
 
-@SuppressWarnings("serial")
 public class FrameConsult extends JFrame{
     protected JPanel panel = new JPanel();
     JLabel login;
     JLabel userGroup;
     JLabel name;
 
-    public FrameConsult() throws SQLException {
+    public FrameConsult() {
         this.setSize(1600, 950);
         setLayout(null);
         this.setLocationRelativeTo(null);
         this.setBackground(Color.WHITE);
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setTitle("Secure File System");
+        this.setTitle("Sistema de arquivos seguro");
         this.panel.setBounds(0, 0, 1600, 950);
 
         if(Facade.getLoggedUser()!= null) {

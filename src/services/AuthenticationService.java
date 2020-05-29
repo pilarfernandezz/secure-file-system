@@ -1,64 +1,66 @@
 package services;
 
-import exceptions.InvalidCertificateException;
 import exceptions.InvalidExtractionCertificateOwnerInfoException;
-import exceptions.InvalidKeyFileException;
 import models.LockedUser;
 import models.User;
 import repositories.LockedUserRepository;
 import repositories.UserRepository;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import java.awt.*;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.List;
 
 public class AuthenticationService {
-    private static AuthenticationService instancia;
-    private String email;
-    private String password;
+    private static AuthenticationService instance;
     private User loggedUser;
     private static UserRepository userRepository;
     private static LockedUserRepository lockedUserRepository;
-    private static DigitalCertificateService digitalCertificateService;
+    private static DigitalCertificateService getInstance;
     private static KeyService keyService;
-    private int totalUsers = 0;
 
-    public static AuthenticationService getAuthenticationInstance() throws SQLException {
-        userRepository = UserRepository.getUserRepositoryInstance();
-        lockedUserRepository = LockedUserRepository.getLockedUserRepositoryInstance();
-        keyService = KeyService.getInstance();
-        digitalCertificateService = DigitalCertificateService.getInstance();
-        if (instancia == null)
-            instancia = new AuthenticationService();
-        return instancia;
+    public static AuthenticationService getInstance() {
+        try {
+            userRepository = UserRepository.getInstance();
+            lockedUserRepository = LockedUserRepository.getInstance();
+            keyService = KeyService.getInstance();
+            getInstance = DigitalCertificateService.getInstance();
+            if (instance == null)
+                instance = new AuthenticationService();
+            return instance;
+        } catch (Exception e) {
+            System.out.println("Ocorreu um erro ao inicializar o serviço de autenticação: " + e.getMessage());
+            return null;
+        }
     }
 
-    public static int getNumberOfUsersRegistered() throws SQLException {
+    private AuthenticationService() {
+    }
+
+    public static int getNumberOfUsersRegistered() {
         return userRepository.countUsers();
     }
 
-    public static User getDataFromCertificate(User user, String path) throws FileNotFoundException, InvalidCertificateException, InvalidExtractionCertificateOwnerInfoException {
-        Map<String, String> data = digitalCertificateService.extractCertificateOwnerInfo(path, true);
-        user.setName(data.get("CN"));
-        user.setEmail(data.get("EMAILADDRESS"));
-        user.setCertificate(data.get("CERTIFICATE"));
-        return user;
+    public static User getDataFromCertificate(User user, String path) {
+        try {
+            Map<String, String> data = getInstance.extractCertificateOwnerInfo(path, true);
+            user.setName(data.get("CN"));
+            user.setEmail(data.get("EMAILADDRESS"));
+            user.setCertificate(data.get("CERTIFICATE"));
+            return user;
+        } catch (InvalidExtractionCertificateOwnerInfoException e) {
+            // todo log
+            return null;
+        } catch (Exception e) {
+            //todo log
+            System.out.println("Ocorreu um erro ao buscar informações do certificado: " + e.getMessage());
+            return null;
+        }
     }
 
-    public boolean checkEmail(String email) throws SQLException, FileNotFoundException, InvalidCertificateException {
+    public boolean checkEmail(String email) {
+        //todo log
         if (this.loggedUser != null) {
             System.out.println("Já existe um usuário logado");
             return false;
@@ -73,74 +75,84 @@ public class AuthenticationService {
         return false;
     }
 
-    public void makeUserLogged(String email, String path, String secret) throws Exception {
-        this.loggedUser = userRepository.getUser(email);
-        this.loggedUser.setTotalAccess(this.loggedUser.getTotalAccess() + 1);
-        this.loggedUser.setPvtKey(keyService.loadPrivateKey(path, secret));
-        this.loggedUser.setPbcKey(keyService.loadPublicKey(digitalCertificateService.loadCertificate(this.loggedUser.getCertificate(),false)));
-        userRepository.updateTotalAccess(this.loggedUser.getId(), this.loggedUser.getTotalAccess());
-        userRepository.updateUser(this.loggedUser);
+    public void makeUserLogged(String email, String path, String secret) {
+        try {
+            //todo log
+            this.loggedUser = userRepository.getUser(email);
+            this.loggedUser.setTotalAccess(this.loggedUser.getTotalAccess() + 1);
+            this.loggedUser.setPvtKey(keyService.loadPrivateKey(path, secret));
+            this.loggedUser.setPbcKey(keyService.loadPublicKey(getInstance.loadCertificate(this.loggedUser.getCertificate(), false)));
+            userRepository.updateTotalAccess(this.loggedUser.getId(), this.loggedUser.getTotalAccess());
+            userRepository.updateUser(this.loggedUser);
+        } catch (Exception e) {
+            System.out.println("Ocorreu um erro ao autenticar o usuário: " + e.getMessage());
+        }
     }
 
-    public void updateNumberConsult() throws SQLException {
-        System.out.println(this.loggedUser.getTotalConsults());
+    public void updateNumberConsult() {
         this.loggedUser.setTotalConsults(this.loggedUser.getTotalConsults() + 1);
         userRepository.updateTotalConsults(this.loggedUser.getId(), this.getLoggedUser().getTotalConsults());
     }
 
-    public void registerUser(String certificatePath, String group, String password, String passwordConfirmation) throws Exception {
-        String salt = this.saltGenerator();
-        String encryptedPw = PasswordCipherService.getInstance().encryptPassword(password + salt);
-        User user = new User(encryptedPw, encryptedPw, group, certificatePath, 0, 0);
-        user.setSalt(salt);
-        String errors = this.verifyFields(user);
-
-        user = AuthenticationService.getDataFromCertificate(user, certificatePath);
-        System.out.println(" authenticationservice" + user.getCertificate());
-        if (errors != "") {
-            throw new Exception(errors);
-        }
-
-        if (userRepository.getUser(user.getEmail()) != null) {
-            throw new Exception("Usuário " + user.getEmail() + " já existe");
-        }
-        if (!user.getPassword().equals(user.getPasswordConfirmation())) {
-            throw new Exception("Senhas não coincidem");
-        }
-
-        this.totalUsers++;
-        userRepository.createUser(user);
-    }
-
-    public void updateUser(String certificatePath, String password, String passwordConfirmation) throws Exception {
-        this.loggedUser.setCertificatePath(certificatePath);
-        this.loggedUser = AuthenticationService.getDataFromCertificate(this.loggedUser, certificatePath);
-        this.loggedUser.setPassword(password + this.loggedUser.getSalt());
-        this.loggedUser.setPasswordConfirmation(passwordConfirmation + this.loggedUser.getSalt());
-        String errors = this.verifyFields(this.loggedUser);
-        if (errors != "") {
-            throw new Exception(errors);
-        }
-
-        if (!this.loggedUser.getPassword().equals(this.loggedUser.getPasswordConfirmation())) {
-            throw new Exception("Senhas não coincidem");
-        }
-
-        if (this.loggedUser.getPassword() == null || this.loggedUser.getPasswordConfirmation() == null || this.loggedUser.getCertificatePath() == null) {
-            throw new Exception("Campos em branco");
-        }
-        userRepository.updateUser(this.loggedUser);
-    }
-
-    public User findUser(String email) throws Exception {
+    public void registerUser(String certificatePath, String group, String password) {
+        //todo log
         try {
-            if(this.loggedUser != null && this.loggedUser.getEmail().equals(email)){
+            String salt = this.saltGenerator();
+            String encryptedPw = PasswordCipherService.getInstance().encryptPassword(password + salt);
+            User user = new User(encryptedPw, encryptedPw, group, certificatePath, 0, 0);
+            user.setSalt(salt);
+            String errors = this.verifyFields(user);
+
+            user = AuthenticationService.getDataFromCertificate(user, certificatePath);
+            System.out.println(" authenticationservice" + user.getCertificate());
+            if (errors != "") {
+                throw new Exception(errors);
+            }
+            if (userRepository.getUser(user.getEmail()) != null) {
+                throw new Exception("Usuário " + user.getEmail() + " já existe");
+            }
+            if (!user.getPassword().equals(user.getPasswordConfirmation())) {
+                throw new Exception("Senhas não coincidem");
+            }
+            userRepository.createUser(user);
+        } catch (Exception e) {
+            System.out.println("Ocorreu um erro ao registrar o usuário: " + e.getMessage());
+        }
+    }
+
+    public void updateUser(String certificatePath, String password, String passwordConfirmation) {
+        try {
+            this.loggedUser.setCertificatePath(certificatePath);
+            this.loggedUser = AuthenticationService.getDataFromCertificate(this.loggedUser, certificatePath);
+            this.loggedUser.setPassword(password + this.loggedUser.getSalt());
+            this.loggedUser.setPasswordConfirmation(passwordConfirmation + this.loggedUser.getSalt());
+            String errors = this.verifyFields(this.loggedUser);
+            if (errors != "") {
+                throw new Exception(errors);
+            }
+
+            if (!this.loggedUser.getPassword().equals(this.loggedUser.getPasswordConfirmation())) {
+                throw new Exception("Senhas não coincidem");
+            }
+
+            if (this.loggedUser.getPassword() == null || this.loggedUser.getPasswordConfirmation() == null || this.loggedUser.getCertificatePath() == null) {
+                throw new Exception("Campos em branco");
+            }
+            userRepository.updateUser(this.loggedUser);
+        } catch (Exception e) {
+            System.out.println("Ocorreu um erro ao atualizar o usuário: " + e.getMessage());
+        }
+    }
+
+    public User findUser(String email) {
+        try {
+            if (this.loggedUser != null && this.loggedUser.getEmail().equals(email)) {
                 return this.loggedUser;
             } else if (email != null && email.length() > 0) {
                 return userRepository.getUser(email);
             }
         } catch (Exception e) {
-            throw new Exception("Email procurado é inválido");
+            System.out.println("Ocorreu um erro ao buscar o usuário: " + e.getMessage());
         }
         return null;
     }
@@ -157,31 +169,40 @@ public class AuthenticationService {
         this.loggedUser = loggedUser;
     }
 
-    public boolean verifyIsLocked(String email) throws Exception {
-        LocalDateTime localDateTime = LocalDateTime.now();
-        LockedUser lockedUser = LockedUserRepository.getLockedUserRepositoryInstance().getLockedUser(email);
+    public boolean verifyIsLocked(String email) {
+        //todo log
+        try {
+            LocalDateTime localDateTime = LocalDateTime.now();
+            LockedUser lockedUser = LockedUserRepository.getInstance().getLockedUser(email);
 
-        if (lockedUser != null) {
-            LocalDateTime lockDate = lockedUser.getLockDate();
-            System.out.println(localDateTime.toString() + " " + lockDate.toString());
-            if (LocalDateTime.parse(LocalDateTime.now().toString()).minusMinutes(2).compareTo(lockedUser.getLockDate()) < 0) {
-                return true;
-            } else {
-                this.unlockUser(email);
+            if (lockedUser != null) {
+                LocalDateTime lockDate = lockedUser.getLockDate();
+                System.out.println(localDateTime.toString() + " " + lockDate.toString());
+                if (LocalDateTime.parse(LocalDateTime.now().toString()).minusMinutes(2).compareTo(lockedUser.getLockDate()) < 0) {
+                    return true;
+                } else {
+                    this.unlockUser(email);
+                }
             }
+            return false;
+        } catch (Exception e) {
+            System.out.println("Ocorreu um erro ao verificar se o usuário está bloqueado: " + e.getMessage());
+            return false;
         }
-        return false;
     }
 
-    public void lockUser(String email) throws SQLException, FileNotFoundException, InvalidCertificateException {
+    public void lockUser(String email) {
+        //todo log
         User user = userRepository.getUser(email);
-        LockedUserRepository.getLockedUserRepositoryInstance().createLockedUser(user);
+        LockedUserRepository.getInstance().createLockedUser(user);
     }
 
-    public void unlockUser(String email) throws Exception {
-        LockedUserRepository.getLockedUserRepositoryInstance().updateLockedUser(email, false);
+    public void unlockUser(String email) {
+        //todo log
+        LockedUserRepository.getInstance().updateLockedUser(email, false);
     }
 
+    // Gera salt de 10 caracteres alfa numéricos
     public String saltGenerator() {
         String alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         String salt = "";
@@ -215,68 +236,75 @@ public class AuthenticationService {
         return errors;
     }
 
-    public boolean verifyPassword(List<int[]> typedPw, String email) throws Exception {
+    // Testando todas as combinações de senhas possíveis para verificar se é correta
+    public boolean verifyPassword(List<int[]> typedPw, String email) {
+        try {
+            User user = this.findUser(email);
 
-        User user = this.findUser(email);
+            String currentPw = "";
+            int[] index = new int[9];
 
-        String currentPw = "";
-        int[] index = new int[9];
+            for (index[0] = 0; index[0] < 2; index[0]++) {
+                for (index[1] = 0; index[1] < 2; index[1]++) {
+                    for (index[2] = 0; index[2] < 2; index[2]++) {
+                        for (index[3] = 0; index[3] < 2; index[3]++) {
+                            for (index[4] = 0; index[4] < 2; index[4]++) {
+                                for (index[5] = 0; index[5] < 2; index[5]++) {
+                                    for (index[6] = 0; index[6] < 2; index[6]++) {
+                                        for (index[7] = 0; index[7] < 2; index[7]++) {
+                                            for (index[8] = 0; index[8] < 2; index[8]++) {
+                                                for (int i = 0; i < typedPw.size(); i++) {
+                                                    currentPw += typedPw.get(i)[index[i]];
+                                                }
 
-        /* Testa todas as possiveis combinacoes de pares */
-        for (index[0] = 0; index[0] < 2; index[0]++) {
-            for (index[1] = 0; index[1] < 2; index[1]++) {
-                for (index[2] = 0; index[2] < 2; index[2]++) {
-                    for (index[3] = 0; index[3] < 2; index[3]++) {
-                        for (index[4] = 0; index[4] < 2; index[4]++) {
-                            for (index[5] = 0; index[5] < 2; index[5]++) {
-                                for (index[6] = 0; index[6] < 2; index[6]++) {
-                                    for (index[7] = 0; index[7] < 2; index[7]++) {
-                                        for (index[8] = 0; index[8] < 2; index[8]++) {
-                                            for (int i = 0; i < typedPw.size(); i++) {                // Para cada possivel combinacao dos pares:
-                                                currentPw += typedPw.get(i)[index[i]];    // Monta string com senha corrente
+                                                String value = PasswordCipherService.getInstance().encryptPassword(currentPw + user.getSalt());
+                                                if (value.equals(user.getPassword())) {
+                                                    return true;
+                                                }
+
+                                                currentPw = "";
+                                                if (typedPw.size() < 9) {
+                                                    break;
+                                                }
                                             }
-
-                                            // Chama funcao que obtem hash da senha+salt em string hex
-                                            String value = PasswordCipherService.getInstance().encryptPassword(currentPw + user.getSalt());
-                                            // Verifica se valorCalculado eh igual a valorArmazenado da senha
-                                            if (value.equals(user.getPassword())) {
-                                                return true;
-                                            }
-
-                                            currentPw = "";
-                                            if (typedPw.size() < 9) {
+                                            if (typedPw.size() < 8) {
                                                 break;
                                             }
                                         }
-                                        if (typedPw.size() < 8) {
+                                        if (typedPw.size() < 7) {
                                             break;
                                         }
-                                    }
-                                    if (typedPw.size() < 7) {
-                                        break;
-                                    }
 
-                                    /* Nao achou nenhuma combinacao de digitos valida */
-                                    return false;
+                                        return false;
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+            return false;
+        } catch (Exception e) {
+            System.out.println("Ocorreu um erro ao validar a senha do usuário: " + e.getMessage());
+            return false;
         }
-        return false;
     }
 
-    public boolean keysValidation(String email, String path, String secret) throws Exception {
-        User user = this.findUser(email);
-        X509Certificate cert = digitalCertificateService.loadCertificate(user.getCertificate(), false);
-        return keyService.verifyKeyPairIntegrity(keyService.loadPublicKey(cert), keyService.loadPrivateKey(path, secret));
+    public boolean keysValidation(String email, String path, String secret) {
+        try {
+            User user = this.findUser(email);
+            X509Certificate cert = getInstance.loadCertificate(user.getCertificate(), false);
+            return keyService.verifyKeyPairIntegrity(keyService.loadPublicKey(cert), keyService.loadPrivateKey(path, secret));
+        } catch (Exception e) {
+            System.out.println("Ocorreu um erro ao validar a chave privadas do usuário: " + e.getMessage());
+            return false;
+        }
     }
 
-    public boolean validatePassword(String pw){
-        for(int i = 0; i < pw.length()-1;i++){
-            if(pw.charAt(i) == pw.charAt(i+1) || pw.charAt(i) == pw.charAt(i+1)+1 || pw.charAt(i) == pw.charAt(i+1)-1) {
+    // Verifica se a senha tem entre tem entre 6 e 8 caracteres alfa numéricos, como especificado
+    public boolean validatePassword(String pw) {
+        for (int i = 0; i < pw.length() - 1; i++) {
+            if (pw.charAt(i) == pw.charAt(i + 1) || pw.charAt(i) == pw.charAt(i + 1) + 1 || pw.charAt(i) == pw.charAt(i + 1) - 1) {
                 return false;
             }
         }

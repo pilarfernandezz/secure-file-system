@@ -24,6 +24,8 @@ public class DigitalEnvelopeService {
         return instance;
     }
 
+    private DigitalEnvelopeService(){}
+
     // recebe o caminho de um arquivo contendo um certificado
     // digital e retorna o seu conteudo como objeto
     public byte[] loadDigitalEnvelope(PrivateKey privateKey, String path) throws NoSuchAlgorithmException, IOException, InvalidKeyException, InvalidDigitalEnvelopeException {
@@ -40,19 +42,15 @@ public class DigitalEnvelopeService {
             if (decripted != null && decripted.length > 0)
                 return decripted;
             else
-                throw new InvalidDigitalEnvelopeException("File " + path + " content doesn't match to a valid digital envelope.");
+                throw new InvalidDigitalEnvelopeException("Conteúdo do arquivo " + path + " não é compatível com um envelope digital válido.");
         } catch (FileNotFoundException e) {
-            throw new FileNotFoundException("File " + path + " doesn't exists.");
+            throw new FileNotFoundException("Arquivo " + path + " não existe.");
         } catch (IOException e) {
-            throw new IOException("File " + path + " is invalid.");
+            throw new IOException("Arquivo " + path + " inválido.");
         } catch (InvalidKeyException e) {
-            throw new InvalidKeyException("The user's private key given is invalid.");
-        } catch (BadPaddingException e) {
-            throw new InvalidDigitalEnvelopeException("File " + path + " content doesn't match to a valid digital envelope.");
-        } catch (NoSuchPaddingException e) {
-            throw new InvalidDigitalEnvelopeException("File " + path + " content doesn't match to a valid digital envelope.");
-        } catch (IllegalBlockSizeException e) {
-            throw new InvalidDigitalEnvelopeException("File " + path + " content doesn't match to a valid digital envelope.");
+            throw new InvalidKeyException("Chave privada fornecida inválida.");
+        } catch (BadPaddingException | NoSuchPaddingException | IllegalBlockSizeException e) {
+            throw new InvalidDigitalEnvelopeException("Conteúdo do arquivo " + path + " não é compatível com um envelope digital válido.");
         }
     }
 }

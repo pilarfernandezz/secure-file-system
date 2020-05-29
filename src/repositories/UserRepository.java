@@ -9,62 +9,60 @@ import java.sql.*;
 
 public class UserRepository {
     private Connection conn;
-    private static UserRepository instancia;
+    private static UserRepository instance;
 
-    public static UserRepository getUserRepositoryInstance() throws SQLException {
-        if (instancia == null)
-            instancia = new UserRepository();
-        return instancia;
+    public static UserRepository getInstance() throws SQLException {
+        if (instance == null)
+            instance = new UserRepository();
+        return instance;
     }
 
     private UserRepository() throws SQLException {
-        this.conn = DriverManager.getConnection("jdbc:mysql://root@localhost/secure_file_system");
+        try{
+            this.conn = DriverManager.getConnection("jdbc:mysql://root@localhost/secure_file_system");
+        } catch (SQLException e){
+            System.out.println("Ocorreu um erro ao conectar com o banco: \n" + e.getMessage());
+        }
     }
 
-    public int countUsers() throws SQLException {
+    // Retorna a quantidade de usuários cadastrados no banco na tabela users
+    public int countUsers() {
         try{
             String query = "select count(*) from users;";
             ResultSet res = this.conn.createStatement().executeQuery(query);
             if (res.next()) {
                 return res.getInt("count(*)");
             }
-
             return 0;
-        } catch (Exception e){
-            throw e;
+        } catch (SQLException e){
+            System.out.println("Ocorreu um erro ao contar número de usuários cadastrados no banco: \n" + e.getMessage());
+            return 0;
         }
     }
 
-    public int getTotalAccess(int id) throws SQLException {
-        String query = "select total_access from users where id = " + id + ";";
-        ResultSet res = this.conn.createStatement().executeQuery(query);
-        if (res.next()) {
-            return res.getInt("total_access");
-        }
-        return 0;
-    }
-
-    public void updateTotalAccess(int id, int totalAccess) throws SQLException {
+    // Acrescenta 1 ao total de acessos do usuário
+    public void updateTotalAccess(int id, int totalAccess) {
         try {
             String query = "update users set total_access = ? where id = ?;";
             PreparedStatement ps = this.conn.prepareStatement(query);
             ps.setInt(1, totalAccess);
             ps.setInt(2, id);
             ps.execute();
-        } catch(Exception e){
-            throw e;
+        } catch(SQLException e){
+            System.out.println("Ocorreu um erro ao atualizar o total de acessos do usuario: \n" + e.getMessage());
         }
     }
 
-    public void updateTotalConsults(int id, int totalConsults) throws SQLException {
+    // Acrescenta 1 ao total de consultas realizadas pelo usuário
+    public void updateTotalConsults(int id, int totalConsults) {
         try {
             String query = "update users set total_consults = ? where id = ?;";
             PreparedStatement ps = this.conn.prepareStatement(query);
             ps.setInt(1, totalConsults);
             ps.setInt(2, id);
             ps.execute();
-        } catch(Exception e){
-            throw e;
+        } catch(SQLException e){
+            System.out.println("Ocorreu um erro ao atualizar o total de consultas do usuario: \n" + e.getMessage());
         }
     }
 
@@ -82,15 +80,15 @@ public class UserRepository {
             ps.setString(7, user.getSalt());
 
             ps.execute();
+            //TODO LOG
             System.out.println("Usuário criado com sucesso");
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Ocorreu um erro ao criar o usuario: " + user.getEmail() + ". \n" + e.getMessage());
         }
     }
 
-    public void updateUser(User user) throws Exception {
+    public void updateUser(User user) {
         try {
-
             String query = "update users set email = ?, password = ?, name = ?, user_group = ?, certificate = ?, salt = ? where id = ?";
             PreparedStatement ps = this.conn.prepareStatement(query);
             ps.setString(1, user.getEmail());
@@ -101,6 +99,7 @@ public class UserRepository {
             ps.setString(6, user.getSalt());
             ps.setInt(7, user.getId());
 
+            //TODO LOG
             ps.execute();
             System.out.println("Usuário atualizado com sucesso");
         } catch (Exception e) {
@@ -108,29 +107,27 @@ public class UserRepository {
         }
     }
 
-    public void deleteUser(int id) throws SQLException {
+    public User getUser(String email) {
         try {
-            String query = "delete from users where id = '" + id + "';";
-            this.conn.createStatement().execute(query);
-            System.out.println("Usuário deletado com sucesso");
-        } catch (SQLException e) {
-            System.out.println("Ocorreu um erro ao deletar o usuario \n" + e.getMessage());
+            String query = "select * from users where email = '" + email + "';";
+            ResultSet res = this.conn.createStatement().executeQuery(query);
+            if (res.next()) {
+                User user = new User(res.getString("password"), res.getString("password"), res.getString("user_group"), null, res.getInt("total_access"), res.getInt("total_consults"));
+                user.setEmail(email);
+                user.setCertificate(res.getString("certificate"));
+                user.setName(res.getString("name"));
+                user.setSalt(res.getString("salt"));
+                user.setId(res.getInt("id"));
+                //todo log
+                return user;
+            }
+            //todo log
+            return null;
+        } catch (Exception e) {
+            //todo log
+            System.out.println("Ocorreu um erro ao buscar o usuario: \n" + e.getMessage());
+            return null;
         }
-    }
-
-    public User getUser(String email) throws SQLException, FileNotFoundException, InvalidCertificateException {
-        String query = "select * from users where email = '" + email + "';";
-        ResultSet res = this.conn.createStatement().executeQuery(query);
-        if (res.next()) {
-            User user = new User(res.getString("password"), res.getString("password"), res.getString("user_group"),null, res.getInt("total_access"), res.getInt("total_consults"));
-            user.setEmail(email);
-            user.setCertificate(res.getString("certificate"));
-            user.setName(res.getString("name"));
-            user.setSalt(res.getString("salt"));
-            user.setId(res.getInt("id"));
-            return user;
-        }
-        return null;
     }
 
     public int getNextId() throws SQLException {

@@ -28,12 +28,10 @@ public class RegisterView extends Frame implements ActionListener {
     private static JRadioButton btnuser;
     private static ButtonGroup btngroup;
     private static JTextField certificatePath = null;
-    private static JTextField group = null;
     private static JPasswordField password = null;
     private static JPasswordField passwordConfirmation = null;
     private static JButton btnRegister;
     private static JButton btnReturn;
-    private int totalQtd = 0;
 
     public RegisterView() throws SQLException {
         super();
@@ -142,19 +140,20 @@ public class RegisterView extends Frame implements ActionListener {
                     this.setVisible(false);
                     this.dispose();
                     try {
-                        ConfirmationView.showScreen(true,certificatePath.getText(), (btnuser.isSelected() ? "Usuário" : "Administrador"), password.getText(), passwordConfirmation.getText());
-                    } catch (InvalidExtractionCertificateOwnerInfoException | SQLException invalidExtractionCertificateOwnerInfoException) {
-                        invalidExtractionCertificateOwnerInfoException.printStackTrace();
+                        //todo log
+                        ConfirmationView.showScreen(true, certificatePath.getText(), (btnuser.isSelected() ? "Usuário" : "Administrador"), password.getText(), passwordConfirmation.getText());
+                    } catch (InvalidExtractionCertificateOwnerInfoException ex) {
+                        //todo log
+                        lblAlertCert.setVisible(true);
+                    } catch (SQLException invalidExtractionCertificateOwnerInfoException){
+                        //todo log
+                        JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                        System.exit(1);
                     }
                 }
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            } catch (FileNotFoundException fileNotFoundException) {
+            } catch (FileNotFoundException | InvalidCertificateException ex) {
+                //todo log
                 lblAlertCert.setVisible(true);
-                fileNotFoundException.printStackTrace();
-            } catch (InvalidCertificateException invalidCertificateException) {
-                lblAlertCert.setVisible(true);
-                invalidCertificateException.printStackTrace();
             }
         } else if (e.getSource() == btnReturn) {
             this.setVisible(false);
@@ -162,22 +161,18 @@ public class RegisterView extends Frame implements ActionListener {
             try {
                 MenuView.showScreen();
             } catch (SQLException throwables) {
-                throwables.printStackTrace();
+                //todo log
+                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                System.exit(1);
             } catch (Exception exception) {
-                exception.printStackTrace();
+                //todo log
+                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                System.exit(1);
             }
         }
     }
 
     public static void showScreen() throws SQLException {
         new RegisterView();
-    }
-
-    public int getTotalQtd() {
-        return totalQtd;
-    }
-
-    public void setTotalQtd(int totalQtd) {
-        this.totalQtd = totalQtd;
     }
 }

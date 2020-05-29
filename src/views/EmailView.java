@@ -82,33 +82,35 @@ public class EmailView extends Frame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == btnStart){
+        if (e.getSource() == btnStart) {
             lblAlert.setVisible(false);
             lblAlert1.setVisible(false);
 
             try {
-                if(Facade.checkEmail(this.txtEmail.getText())){
-                    if(Facade.verifyIsLocked(this.txtEmail.getText())){
+                if (Facade.checkEmail(this.txtEmail.getText())) {
+                    if (Facade.verifyIsLocked(this.txtEmail.getText())) {
                         lblAlert1.setVisible(true);
                         this.panel.repaint();
                     } else {
-                        User user = Facade.findUser(this.txtEmail.getText());
                         this.setVisible(false);
                         this.dispose();
                         PasswordView.showScreen(this.txtEmail.getText());
                     }
-
                 } else {
                     lblAlert.setVisible(true);
                     this.panel.repaint();
                 }
             } catch (SQLException throwables) {
-                throwables.printStackTrace();
+                //todo log
+                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                System.exit(1);
             } catch (Exception exception) {
-                exception.printStackTrace();
+                //todo log
+                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                System.exit(1);
             }
-        } else if(e.getSource() == btnCancel){
-			System.exit(1);
-		}
+        } else if (e.getSource() == btnCancel) {
+            System.exit(1);
+        }
     }
 }

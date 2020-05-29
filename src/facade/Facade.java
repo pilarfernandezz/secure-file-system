@@ -20,16 +20,16 @@ public class Facade {
         new EmailView();
     }
 
-    public static int getNumberOfUsersRegistered() throws SQLException {
-        return AuthenticationService.getAuthenticationInstance().getNumberOfUsersRegistered();
+    public static int getNumberOfUsersRegistered() {
+        return AuthenticationService.getInstance().getNumberOfUsersRegistered();
     }
 
-    public static void updateConsultNumber() throws SQLException {
-        AuthenticationService.getAuthenticationInstance().updateNumberConsult();
+    public static void updateConsultNumber() {
+        AuthenticationService.getInstance().updateNumberConsult();
     }
 
-    public static void registerUser(String certificatePath, String group, String password, String passwordConfirmation) throws Exception {
-        AuthenticationService.getAuthenticationInstance().registerUser(certificatePath, group, password, passwordConfirmation);
+    public static void registerUser(String certificatePath, String group, String password) {
+        AuthenticationService.getInstance().registerUser(certificatePath, group, password);
 
     }
 
@@ -37,55 +37,55 @@ public class Facade {
         return DigitalCertificateService.getInstance().extractCertificateOwnerInfo(path, true);
     }
 
-    public static User getLoggedUser() throws SQLException {
-        return AuthenticationService.getAuthenticationInstance().getLoggedUser();
+    public static User getLoggedUser() {
+        return AuthenticationService.getInstance().getLoggedUser();
     }
 
-    public static boolean checkEmail(String email) throws SQLException, FileNotFoundException, InvalidCertificateException {
-        return AuthenticationService.getAuthenticationInstance().checkEmail(email);
+    public static boolean checkEmail(String email) {
+        return AuthenticationService.getInstance().checkEmail(email);
     }
 
-    public static User findUser(String email) throws Exception {
-        return AuthenticationService.getAuthenticationInstance().findUser(email);
+    public static User findUser(String email) {
+        return AuthenticationService.getInstance().findUser(email);
     }
 
-    public static void updateUser(String certificatePath, String password, String passwordConfirmation) throws Exception {
-        AuthenticationService.getAuthenticationInstance().updateUser(certificatePath, password, passwordConfirmation);
+    public static void updateUser(String certificatePath, String password, String passwordConfirmation) {
+        AuthenticationService.getInstance().updateUser(certificatePath, password, passwordConfirmation);
     }
 
-    public static boolean verifyIsLocked(String email) throws Exception {
-        return AuthenticationService.getAuthenticationInstance().verifyIsLocked(email);
+    public static boolean verifyIsLocked(String email) {
+        return AuthenticationService.getInstance().verifyIsLocked(email);
     }
 
-    public static void lockUser(String email) throws SQLException, FileNotFoundException, InvalidCertificateException {
-        AuthenticationService.getAuthenticationInstance().lockUser(email);
+    public static void lockUser(String email) {
+        AuthenticationService.getInstance().lockUser(email);
     }
 
-    public static boolean verifyPassword(List<int[]> typedPw, String email) throws Exception {
-        return AuthenticationService.getAuthenticationInstance().verifyPassword(typedPw, email);
+    public static boolean verifyPassword(List<int[]> typedPw, String email) {
+        return AuthenticationService.getInstance().verifyPassword(typedPw, email);
     }
 
-    public static void makeUserLogged(String email, String path, String secret) throws Exception {
-        AuthenticationService.getAuthenticationInstance().makeUserLogged(email, path, secret);
+    public static void makeUserLogged(String email, String path, String secret) {
+        AuthenticationService.getInstance().makeUserLogged(email, path, secret);
     }
 
     public static byte[] decryptFile(String email, String fileName, boolean save, String newFileName) throws Exception {
         return CipherService.getInstance().decryptFileContent(Facade.findUser(email), fileName, save, newFileName);
     }
 
-    public static String[][] getIndexInfo(byte[] index) throws UnsupportedEncodingException {
+    public static String[][] getIndexInfo(byte[] index) throws Exception {
         return IndexService.getInstance().getIndexInfo(index);
     }
 
-    public static boolean keysValidation(String email, String path, String secret) throws Exception {
-        return AuthenticationService.getAuthenticationInstance().keysValidation(email, path, secret);
+    public static boolean keysValidation(String email, String path, String secret) {
+        return AuthenticationService.getInstance().keysValidation(email, path, secret);
     }
 
-    public static boolean validatePassword(String pw) throws SQLException {
-        return AuthenticationService.getAuthenticationInstance().validatePassword(pw);
+    public static boolean validatePassword(String pw) {
+        return AuthenticationService.getInstance().validatePassword(pw);
     }
 
-    public static boolean validateCertificate(String path) throws SQLException, FileNotFoundException, InvalidCertificateException {
+    public static boolean validateCertificate(String path) throws FileNotFoundException, InvalidCertificateException {
         return DigitalCertificateService.getInstance().loadCertificate(path, true) != null ? true : false;
     }
 }

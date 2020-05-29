@@ -3,14 +3,9 @@ package views;
 import facade.Facade;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.geom.Rectangle2D;
-import java.io.UnsupportedEncodingException;
-import java.time.format.SignStyle;
-import java.util.Map;
 
 public class TableView extends JPanel implements MouseListener {
     private JLabel table[][];
@@ -18,7 +13,7 @@ public class TableView extends JPanel implements MouseListener {
     private String path;
     private String[][] index;
 
-    public TableView() throws UnsupportedEncodingException {
+    public TableView() {
         super();
 
         this.setBackground(Color.WHITE);
@@ -28,8 +23,7 @@ public class TableView extends JPanel implements MouseListener {
         this.setVisible(true);
     }
 
-    public void showInfo() throws UnsupportedEncodingException {
-
+    public void showInfo() throws Exception {
         int x = 0, y = 0;
         this.index = Facade.getIndexInfo(this.content);
 
@@ -46,9 +40,9 @@ public class TableView extends JPanel implements MouseListener {
         for (i = 0; i < index.length; i++) {
             for (j = 0; j < 3; j++) {
                 if (i != 0) { //Adiciona informações dos arquivos na tabela
-                    String content = index[i - 1][j+1];
+                    String content = index[i - 1][j + 1];
                     System.out.println(content);
-                    System.out.println(index[i - 1][j+1]);
+                    System.out.println(index[i - 1][j + 1]);
                     this.table[i][j] = new JLabel(content);
                     if (j == 0) this.table[i][j].addMouseListener(this);
                 }
@@ -63,10 +57,10 @@ public class TableView extends JPanel implements MouseListener {
         }
 
         for (int k = 0; k < 3; k++) {
-            this.table[i][k] = new JLabel(index[i - 1][k+1]);
+            this.table[i][k] = new JLabel(index[i - 1][k + 1]);
             this.table[i][k].addMouseListener(this);
             this.table[i][k].setBounds(x, y, 526, 20);
-            System.out.println(index[i - 1][k+1]);
+            System.out.println(index[i - 1][k + 1]);
 
             this.add(this.table[i][k]);
             x += 530;
@@ -87,13 +81,13 @@ public class TableView extends JPanel implements MouseListener {
                 }
             }
             try {
-                if(Facade.decryptFile(Facade.getLoggedUser().getEmail(), path + "/" + nameEncoded, true, ((JLabel) e.getSource()).getText()) != null){
-                    JOptionPane.showMessageDialog(null, "Arquivo " + ((JLabel) e.getSource()).getText() +" decriptado e salvo com sucesso.");
+                if (Facade.decryptFile(Facade.getLoggedUser().getEmail(), path + "/" + nameEncoded, true, ((JLabel) e.getSource()).getText()) != null) {
+                    JOptionPane.showMessageDialog(null, "Arquivo " + ((JLabel) e.getSource()).getText() + " decriptado e salvo com sucesso.");
                 }
+                //todo log
             } catch (Exception exception) {
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro ao decriptar e salvar o arquivo " + ((JLabel) e.getSource()).getText() + ".");
-
-                exception.printStackTrace();
+//todo log
             }
         }
     }

@@ -1,13 +1,15 @@
 package views;
 
+import exceptions.InvalidCertificateException;
+import exceptions.InvalidExtractionCertificateOwnerInfoException;
 import facade.Facade;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
-import java.util.List;
 
 public class ChangePwView extends Frame implements ActionListener {
     private static ChangePwView instance;
@@ -20,14 +22,11 @@ public class ChangePwView extends Frame implements ActionListener {
     private JLabel lblTotal;
     private JLabel lblAlertPw;
     private JLabel lblAlertCert;
-    private JLabel lblTotalQtd;
     private static JTextField certificatePath = null;
     private static JPasswordField password = null;
     private static JPasswordField passwordConfirmation = null;
     private static JButton btnRegister;
     private static JButton btnReturn;
-    private int totalQtd = 0;
-    private List<int[]> typedPw;
 
     public ChangePwView() throws SQLException {
         super();
@@ -40,13 +39,9 @@ public class ChangePwView extends Frame implements ActionListener {
         this.panel.setBounds(0, 0, 800, 600);
         this.panel.add(lblTitle);
 
-        lblTotal = new JLabel("Total de acessos do usuário:");
+        lblTotal = new JLabel("Total de acessos do usuário: " + Facade.getLoggedUser().getTotalAccess());
         lblTotal.setBounds(280, -160, 800, 600);
         this.panel.add(lblTotal);
-
-        lblTotalQtd = new JLabel(String.valueOf(totalQtd));
-        lblTotalQtd.setBounds(465, -160, 800, 600);
-        this.panel.add(lblTotalQtd);
 
         lblText = new JLabel("Alterar Senha Pessoal e Certificado Digital:");
         lblText.setBounds(270, -120, 800, 600);
@@ -109,10 +104,10 @@ public class ChangePwView extends Frame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnRegister) {
-            lblAlertCert.setVisible(false);
-            lblAlertPw.setVisible(false);
-
             try {
+                lblAlertCert.setVisible(false);
+                lblAlertPw.setVisible(false);
+
                 boolean invalidPw = password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+") || !Facade.validatePassword(password.getText());
                 boolean invalidCert = certificatePath.getText().trim().equals("") || certificatePath.getText() == null || !Facade.validateCertificate(certificatePath.getText());
                 lblAlertPw.setVisible(invalidPw);
@@ -124,8 +119,13 @@ public class ChangePwView extends Frame implements ActionListener {
                     this.dispose();
                     ConfirmationView.showScreen(false, certificatePath.getText(), null, password.getText(), passwordConfirmation.getText());
                 }
-            } catch (Exception exception) {
-                exception.printStackTrace();
+            } catch (FileNotFoundException | InvalidCertificateException | InvalidExtractionCertificateOwnerInfoException ex) {
+                System.out.println("aqui " + ex.getMessage());
+                lblAlertCert.setVisible(true);
+            } catch (SQLException ex) {
+                //todo log
+                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                System.exit(1);
             }
         } else if (e.getSource() == btnReturn) {
             this.setVisible(false);
@@ -140,13 +140,5 @@ public class ChangePwView extends Frame implements ActionListener {
 
     public static void showScreen() throws SQLException {
         new ChangePwView();
-    }
-
-    public int getTotalQtd() {
-        return totalQtd;
-    }
-
-    public void setTotalQtd(int totalQtd) {
-        this.totalQtd = totalQtd;
     }
 }

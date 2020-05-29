@@ -12,12 +12,10 @@ import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 
 public class MenuView extends Frame implements ActionListener {
-    private static MenuView instance;
     private Font titleFont = new Font("Monospaced", Font.BOLD, 30);
     private JLabel lblTitle;
     private JLabel lblText;
     private JLabel lblTotal;
-    private JLabel lblTotalQtd;
     private static JButton btnRegister;
     private static JButton btnChange;
     private static JButton btnConsult;
@@ -81,7 +79,8 @@ public class MenuView extends Frame implements ActionListener {
             try {
                 RegisterView.showScreen();
             } catch (SQLException throwables) {
-                throwables.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                System.exit(1);
             }
         } else if (e.getSource() == btnChange){
             this.setVisible(false);
@@ -89,7 +88,9 @@ public class MenuView extends Frame implements ActionListener {
             try {
                 ChangePwView.showScreen();
             } catch (SQLException throwables) {
-                throwables.printStackTrace();
+                //todo log
+                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                System.exit(1);
             }
         } else if (e.getSource() == btnConsult){
             this.setVisible(false);
@@ -97,7 +98,8 @@ public class MenuView extends Frame implements ActionListener {
             try {
                 ConsultView.showScreen();
             } catch (SQLException | UnsupportedEncodingException throwables) {
-                throwables.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                System.exit(1);
             }
         } else if (e.getSource() == btnExit){
             this.setVisible(false);
@@ -105,29 +107,21 @@ public class MenuView extends Frame implements ActionListener {
             try {
                 ExitView.showScreen();
             } catch (SQLException throwables) {
-                throwables.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                System.exit(1);
             }
         } else {
             System.exit(1);
         }
     }
 
-    public boolean isAdmin() throws SQLException {
-        User user = AuthenticationService.getAuthenticationInstance().getLoggedUser();
+    public boolean isAdmin() {
+        User user = AuthenticationService.getInstance().getLoggedUser();
         if(user.getGroup().equals("Administrador")) return true;
         return false;
     }
 
     public static void showScreen() throws Exception {
         new MenuView();
-    }
-
-
-    public int getTotalQtd() {
-        return totalQtd;
-    }
-
-    public void setTotalQtd(int totalQtd) {
-        this.totalQtd = totalQtd;
     }
 }

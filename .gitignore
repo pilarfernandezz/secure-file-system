@@ -9,3 +9,4 @@ Keys/*
 *.crt
 *.class
 out/*
+.DS_Store

@@ -114,12 +114,13 @@ public class PvtKeyView extends Frame implements ActionListener {
                         this.dispose();
                         Facade.makeUserLogged(this.email, txtPath.getText(),txtSecret.getText());
                         MenuView.showScreen();
+                        //todo log
                     }
                 }
             } catch (Exception exception) {
                 lblAlert.setVisible(true);
                 this.keyErrors++;
-                exception.printStackTrace();
+                //todo log
             }
         } else if(e.getSource() == btnCancel){
             System.exit(1);
