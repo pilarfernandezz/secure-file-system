@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 public class ExitView extends Frame implements ActionListener {
@@ -38,7 +37,7 @@ public class ExitView extends Frame implements ActionListener {
         this.panel.add(lblText);
 
         lblConfirmation = new JLabel("Pressione o botão Sair para confirmar.");
-        lblConfirmation.setBounds(320, 190, 300, 50);
+        lblConfirmation.setBounds(250, 190, 300, 50);
         this.panel.add(lblConfirmation);
 
         btnExit = new JButton("Sair");
@@ -70,12 +69,7 @@ public class ExitView extends Frame implements ActionListener {
             this.dispose();
             try {
                 MenuView.showScreen();
-            } catch (SQLException throwables) {
-                //todo log
-                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
-                System.exit(1);
             } catch (Exception exception) {
-                //todo log
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
                 System.exit(1);
             }

@@ -7,6 +7,7 @@ import repositories.LockedUserRepository;
 import repositories.UserRepository;
 
 import java.security.cert.X509Certificate;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -50,17 +51,14 @@ public class AuthenticationService {
             user.setCertificate(data.get("CERTIFICATE"));
             return user;
         } catch (InvalidExtractionCertificateOwnerInfoException e) {
-            // todo log
             return null;
         } catch (Exception e) {
-            //todo log
             System.out.println("Ocorreu um erro ao buscar informações do certificado: " + e.getMessage());
             return null;
         }
     }
 
     public boolean checkEmail(String email) {
-        //todo log
         if (this.loggedUser != null) {
             System.out.println("Já existe um usuário logado");
             return false;
@@ -77,7 +75,6 @@ public class AuthenticationService {
 
     public void makeUserLogged(String email, String path, String secret) {
         try {
-            //todo log
             this.loggedUser = userRepository.getUser(email);
             this.loggedUser.setTotalAccess(this.loggedUser.getTotalAccess() + 1);
             this.loggedUser.setPvtKey(keyService.loadPrivateKey(path, secret));
@@ -95,7 +92,6 @@ public class AuthenticationService {
     }
 
     public void registerUser(String certificatePath, String group, String password) {
-        //todo log
         try {
             String salt = this.saltGenerator();
             String encryptedPw = PasswordCipherService.getInstance().encryptPassword(password + salt);
@@ -170,14 +166,12 @@ public class AuthenticationService {
     }
 
     public boolean verifyIsLocked(String email) {
-        //todo log
         try {
             LocalDateTime localDateTime = LocalDateTime.now();
             LockedUser lockedUser = LockedUserRepository.getInstance().getLockedUser(email);
 
             if (lockedUser != null) {
                 LocalDateTime lockDate = lockedUser.getLockDate();
-                System.out.println(localDateTime.toString() + " " + lockDate.toString());
                 if (LocalDateTime.parse(LocalDateTime.now().toString()).minusMinutes(2).compareTo(lockedUser.getLockDate()) < 0) {
                     return true;
                 } else {
@@ -191,14 +185,12 @@ public class AuthenticationService {
         }
     }
 
-    public void lockUser(String email) {
-        //todo log
+    public void lockUser(String email) throws SQLException {
         User user = userRepository.getUser(email);
         LockedUserRepository.getInstance().createLockedUser(user);
     }
 
-    public void unlockUser(String email) {
-        //todo log
+    public void unlockUser(String email) throws Exception {
         LockedUserRepository.getInstance().updateLockedUser(email, false);
     }
 

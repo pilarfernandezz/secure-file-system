@@ -42,8 +42,6 @@ public class TableView extends JPanel implements MouseListener {
             for (j = 0; j < 3; j++) {
                 if (i != 0) { //Adiciona informações dos arquivos na tabela
                     String content = index[i - 1][j + 1];
-                    System.out.println(content);
-                    System.out.println(index[i - 1][j + 1]);
                     this.table[i][j] = new JLabel(content);
                     if (j == 0) this.table[i][j].addMouseListener(this);
                 }
@@ -61,12 +59,18 @@ public class TableView extends JPanel implements MouseListener {
             this.table[i][k] = new JLabel(index[i - 1][k + 1]);
             this.table[i][k].addMouseListener(this);
             this.table[i][k].setBounds(x, y, 526, 20);
-            System.out.println(index[i - 1][k + 1]);
 
             this.add(this.table[i][k]);
             x += 530;
         }
         this.repaint();
+    }
+
+    private String normalizeString(String s) {
+        return s.toLowerCase().trim().replace("á", "a").replace("ã", "a")
+                .replace("à", "a").replace("é", "e").replace("ê", "e")
+                .replace("ô", "o").replace("ó", "o").replace("ç", "c")
+                .replace("õ", "o").replace("ú", "u");
     }
 
     @Override
@@ -76,12 +80,11 @@ public class TableView extends JPanel implements MouseListener {
 
             String nameEncoded = null;
             for (int i = 0; i < this.index.length; i++) {
-                System.out.println(this.index[i][1] + " " + this.index[i][0]);
                 if (this.index[i][1].equals(((JLabel) e.getSource()).getText())) {
-                    if (Facade.getLoggedUser().getName().equals(this.index[i][1]) || Facade.getLoggedUser().getGroup().equals(this.index[i][2])) {
+                    if (this.normalizeString(Facade.getLoggedUser().getName()).equals(this.normalizeString(this.index[i][2]))
+                            || this.normalizeString(Facade.getLoggedUser().getGroup()).equals(this.normalizeString(this.index[i][3]))) {
                         Facade.registerLogMessage(8011, Facade.getLoggedUser().getEmail(), ((JLabel) e.getSource()).getText(), LocalDateTime.now());
                         nameEncoded = this.index[i][0];
-                        System.out.println(nameEncoded);
                         break;
                     } else {
                         Facade.registerLogMessage(8012, Facade.getLoggedUser().getEmail(), ((JLabel) e.getSource()).getText(), LocalDateTime.now());
@@ -93,10 +96,8 @@ public class TableView extends JPanel implements MouseListener {
                 if (nameEncoded != null && Facade.decryptFile(Facade.getLoggedUser().getEmail(), path + "/" + nameEncoded, true, ((JLabel) e.getSource()).getText()) != null) {
                     JOptionPane.showMessageDialog(null, "Arquivo " + ((JLabel) e.getSource()).getText() + " decriptado e salvo com sucesso.");
                 }
-                //todo log
             } catch (Exception exception) {
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro ao decriptar e salvar o arquivo " + ((JLabel) e.getSource()).getText() + ".");
-//todo log
             }
         }
     }

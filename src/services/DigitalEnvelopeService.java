@@ -24,7 +24,8 @@ public class DigitalEnvelopeService {
         return instance;
     }
 
-    private DigitalEnvelopeService(){}
+    private DigitalEnvelopeService() {
+    }
 
     // recebe o caminho de um arquivo contendo um certificado
     // digital e retorna o seu conteudo como objeto

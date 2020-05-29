@@ -6,9 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
@@ -24,7 +21,7 @@ public class ConsultView extends FrameConsult implements ActionListener {
     private TableView tableView;
     private byte[] folderContent;
 
-    public ConsultView() throws SQLException, UnsupportedEncodingException {
+    public ConsultView() {
         super();
 
         this.setBackground(Color.WHITE);
@@ -78,7 +75,7 @@ public class ConsultView extends FrameConsult implements ActionListener {
         this.setVisible(true);
     }
 
-    public static void showScreen() throws SQLException, UnsupportedEncodingException {
+    public static void showScreen() {
         Facade.registerLogMessage(8001, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
         new ConsultView();
     }

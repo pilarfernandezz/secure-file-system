@@ -5,7 +5,7 @@ import facade.Facade;
 import javax.swing.*;
 import java.awt.*;
 
-public class FrameConsult extends JFrame{
+public class FrameConsult extends JFrame {
     protected JPanel panel = new JPanel();
     JLabel login;
     JLabel userGroup;
@@ -21,7 +21,7 @@ public class FrameConsult extends JFrame{
         this.setTitle("Sistema de arquivos seguro");
         this.panel.setBounds(0, 0, 1600, 950);
 
-        if(Facade.getLoggedUser()!= null) {
+        if (Facade.getLoggedUser() != null) {
             login = new JLabel(Facade.getLoggedUser().getEmail());
             login.setBounds(150, -250, 800, 600);
             this.login.setVisible(false);
@@ -43,7 +43,7 @@ public class FrameConsult extends JFrame{
         this.getContentPane().add(panel);
     }
 
-    public void showHeader(){
+    public void showHeader() {
         this.login.setVisible(true);
         this.name.setVisible(true);
         this.userGroup.setVisible(true);

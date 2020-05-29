@@ -8,7 +8,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
@@ -23,7 +22,7 @@ public class MenuView extends Frame implements ActionListener {
     private static JButton btnExit;
     private int totalQtd = 0;
 
-    public MenuView() throws Exception {
+    public MenuView() {
         super();
 
         this.setBackground(Color.WHITE);
@@ -46,7 +45,7 @@ public class MenuView extends Frame implements ActionListener {
         btnRegister.setBounds(180, 250, 200, 40);
         this.panel.add(btnRegister);
         btnRegister.addActionListener(this);
-        if(!this.isAdmin()) btnRegister.setEnabled(false);
+        if (!this.isAdmin()) btnRegister.setEnabled(false);
 
         btnChange = new JButton("Alterar senha e certificado");
         btnChange.setBounds(410, 250, 200, 40);
@@ -72,47 +71,35 @@ public class MenuView extends Frame implements ActionListener {
         this.setVisible(true);
     }
 
-    public static void showScreen() throws Exception {
+    public static void showScreen() {
         Facade.registerLogMessage(5001, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
         new MenuView();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == btnRegister){
-			this.setVisible(false);
-			this.dispose();
+        if (e.getSource() == btnRegister) {
+            this.setVisible(false);
+            this.dispose();
             try {
                 Facade.registerLogMessage(5002, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
-                RegisterView.showScreen();
+                RegisterView.showScreen(null, null, null, null);
             } catch (SQLException throwables) {
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
                 Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
                 System.exit(1);
             }
-        } else if (e.getSource() == btnChange){
+        } else if (e.getSource() == btnChange) {
             this.setVisible(false);
             this.dispose();
-            try {
-                Facade.registerLogMessage(5003, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
-                ChangePwView.showScreen();
-            } catch (SQLException throwables) {
-                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
-                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
-                System.exit(1);
-            }
-        } else if (e.getSource() == btnConsult){
+            Facade.registerLogMessage(5003, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+            ChangePwView.showScreen(null, null, null);
+        } else if (e.getSource() == btnConsult) {
             this.setVisible(false);
             this.dispose();
-            try {
-                Facade.registerLogMessage(5004, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
-                ConsultView.showScreen();
-            } catch (SQLException | UnsupportedEncodingException throwables) {
-                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
-                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
-                System.exit(1);
-            }
-        } else if (e.getSource() == btnExit){
+            Facade.registerLogMessage(5004, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+            ConsultView.showScreen();
+        } else if (e.getSource() == btnExit) {
             this.setVisible(false);
             this.dispose();
             Facade.registerLogMessage(5005, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
@@ -125,7 +112,7 @@ public class MenuView extends Frame implements ActionListener {
 
     public boolean isAdmin() {
         User user = AuthenticationService.getInstance().getLoggedUser();
-        if(user.getGroup().equals("Administrador")) return true;
+        if (user.getGroup().equals("Administrador")) return true;
         return false;
     }
 }

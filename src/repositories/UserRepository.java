@@ -65,19 +65,17 @@ public class UserRepository {
 
     public void createUser(User user) {
         try {
-            String query = "insert into users (id,email,password,name,user_group, certificate,salt) values(?,?,?,?,?,?,?);";
-            System.out.println(user.getCertificate());
+            String query = "insert into users (id,email,password,name,user_group_id, certificate,salt) values(?,?,?,?,?,?,?);";
             PreparedStatement ps = this.conn.prepareStatement(query);
             ps.setInt(1, this.getNextId());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPassword());
             ps.setString(4, user.getName());
-            ps.setString(5, user.getGroup());
+            ps.setInt(5, this.getGroupID(user.getGroup()));
             ps.setString(6, user.getCertificate());
             ps.setString(7, user.getSalt());
 
             ps.execute();
-            //TODO LOG
             System.out.println("Usuário criado com sucesso");
         } catch (SQLException e) {
             System.out.println("Ocorreu um erro ao criar o usuario: " + user.getEmail() + ". \n" + e.getMessage());
@@ -86,17 +84,16 @@ public class UserRepository {
 
     public void updateUser(User user) {
         try {
-            String query = "update users set email = ?, password = ?, name = ?, user_group = ?, certificate = ?, salt = ? where id = ?";
+            String query = "update users set email = ?, password = ?, name = ?, user_group_id = ?, certificate = ?, salt = ? where id = ?";
             PreparedStatement ps = this.conn.prepareStatement(query);
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getName());
-            ps.setString(4, user.getGroup());
+            ps.setInt(4, this.getGroupID(user.getGroup()));
             ps.setString(5, user.getCertificate());
             ps.setString(6, user.getSalt());
             ps.setInt(7, user.getId());
 
-            //TODO LOG
             ps.execute();
             System.out.println("Usuário atualizado com sucesso");
         } catch (Exception e) {
@@ -104,9 +101,23 @@ public class UserRepository {
         }
     }
 
+    public int getGroupID(String name) {
+        try {
+            String query = "select id from user_groups where name = '" + name + "';";
+            ResultSet res = this.conn.createStatement().executeQuery(query);
+            if (res.next()) {
+                return res.getInt("id");
+            }
+            return 0;
+        } catch (Exception e) {
+            System.out.println("Ocorreu um erro ao buscar o grupo de usuario: \n" + e.getMessage());
+            return 0;
+        }
+    }
+
     public User getUser(String email) {
         try {
-            String query = "select * from users where email = '" + email + "';";
+            String query = "select U.*,G.name as user_group from users U left join user_groups G on U.user_group_id = G.id where U.email = '" + email + "';";
             ResultSet res = this.conn.createStatement().executeQuery(query);
             if (res.next()) {
                 User user = new User(res.getString("password"), res.getString("password"), res.getString("user_group"), null, res.getInt("total_access"), res.getInt("total_consults"));
@@ -115,13 +126,10 @@ public class UserRepository {
                 user.setName(res.getString("name"));
                 user.setSalt(res.getString("salt"));
                 user.setId(res.getInt("id"));
-                //todo log
                 return user;
             }
-            //todo log
             return null;
         } catch (Exception e) {
-            //todo log
             System.out.println("Ocorreu um erro ao buscar o usuario: \n" + e.getMessage());
             return null;
         }

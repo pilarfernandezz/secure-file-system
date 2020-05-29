@@ -38,8 +38,7 @@ public class EmailView extends Frame implements ActionListener {
         lblEmail.setBounds(250, 150, 100, 50);
         this.panel.add(lblEmail);
 
-        //TODO TIRAR EMAIL
-        txtEmail = new JTextField("user01@inf1416.puc-rio.br");
+        txtEmail = new JTextField();
         txtEmail.setBounds(320, 160, 200, 30);
         this.panel.add(txtEmail);
 

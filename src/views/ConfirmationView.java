@@ -23,7 +23,6 @@ public class ConfirmationView extends Frame implements ActionListener {
     private JLabel lblTitle;
     private JLabel lblText;
     private JLabel lblTotal;
-    private JLabel lblTotalQtd;
     private Map<String, String> certInfo;
     private JLabel lblVersion;
     private JLabel lblIssuer;
@@ -33,7 +32,6 @@ public class ConfirmationView extends Frame implements ActionListener {
     private static JButton btnRegister;
     private static JButton btnReturn;
     private static boolean register;
-    private int totalQtd = 0;
 
     public ConfirmationView() throws InvalidExtractionCertificateOwnerInfoException, SQLException {
         super();
@@ -48,13 +46,9 @@ public class ConfirmationView extends Frame implements ActionListener {
         this.panel.setBounds(0, 0, 800, 600);
         this.panel.add(lblTitle);
 
-        lblTotal = new JLabel("Total de usuários do sistema:");
+        lblTotal = new JLabel("Total de usuários do sistema: " + Facade.getNumberOfUsersRegistered());
         lblTotal.setBounds(280, -160, 800, 600);
         this.panel.add(lblTotal);
-
-        lblTotalQtd = new JLabel(String.valueOf(Facade.getNumberOfUsersRegistered()));
-        lblTotalQtd.setBounds(470, -160, 800, 600);
-        this.panel.add(lblTotalQtd);
 
         lblText = new JLabel("Confirmação cadastro:");
         lblText.setBounds(300, -120, 800, 600);
@@ -65,27 +59,27 @@ public class ConfirmationView extends Frame implements ActionListener {
         this.panel.add(lblCertificate);
 
         lblSerie = new JLabel("Serie: " + this.certInfo.get("SERIE"));
-        lblSerie.setBounds(110, 215, 500, 20);
+        lblSerie.setBounds(110, 240, 500, 20);
         this.panel.add(lblSerie);
 
         lblIssuer = new JLabel("Emissor: " + this.certInfo.get("ISSUER"));
-        lblIssuer.setBounds(110, 240, 500, 20);
+        lblIssuer.setBounds(110, 265, 500, 20);
         this.panel.add(lblIssuer);
 
         lblSignType = new JLabel("Tipo assinatura: " + this.certInfo.get("SIGNATURETYPE"));
-        lblSignType.setBounds(110, 265, 500, 20);
+        lblSignType.setBounds(110, 290, 500, 20);
         this.panel.add(lblSignType);
 
         lblVersion = new JLabel("Versão: " + this.certInfo.get("VERSION"));
-        lblVersion.setBounds(110, 290, 500, 20);
+        lblVersion.setBounds(110, 315, 500, 20);
         this.panel.add(lblVersion);
 
         lblValidUntil = new JLabel("Válido até: " + this.certInfo.get("VALIDUNTIL"));
-        lblValidUntil.setBounds(110, 315, 500, 20);
+        lblValidUntil.setBounds(110, 340, 500, 20);
         this.panel.add(lblValidUntil);
 
         lblEmailAddress = new JLabel("Email: " + this.certInfo.get("EMAILADDRESS"));
-        lblEmailAddress.setBounds(110, 340, 500, 20);
+        lblEmailAddress.setBounds(110, 365, 500, 20);
         this.panel.add(lblEmailAddress);
 
         btnRegister = new JButton("Registrar");
@@ -109,6 +103,9 @@ public class ConfirmationView extends Frame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnRegister) {
+            RegisterView.set_certificatePath(null);
+            RegisterView.set_password(null);
+            RegisterView.set_passwordConfirmation(null);
             Facade.registerLogMessage(register ? 6005 : 7004, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
             this.setVisible(false);
             this.dispose();
@@ -129,7 +126,8 @@ public class ConfirmationView extends Frame implements ActionListener {
             this.setVisible(false);
             this.dispose();
             try {
-                RegisterView.showScreen();
+                if (register) RegisterView.showScreen(certificatePath, group, password, passwordConfirmation);
+                else ChangePwView.showScreen(certificatePath, password, passwordConfirmation);
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
@@ -143,13 +141,5 @@ public class ConfirmationView extends Frame implements ActionListener {
         ConfirmationView.password = password;
         ConfirmationView.passwordConfirmation = passwordConfirmation;
         new ConfirmationView();
-    }
-
-    public int getTotalQtd() {
-        return totalQtd;
-    }
-
-    public void setTotalQtd(int totalQtd) {
-        this.totalQtd = totalQtd;
     }
 }

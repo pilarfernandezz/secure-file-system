@@ -196,7 +196,7 @@ public class PasswordView extends Frame implements ActionListener {
                 try {
                     if (typedPw == null || typedPw.size() == 0 || !Facade.verifyPassword(typedPw, this.email)) {
                         this.passwordErrors++;
-                        Facade.registerLogMessage(this.passwordErrors == 1? 3004 : 3005, email, null, LocalDateTime.now());
+                        Facade.registerLogMessage(this.passwordErrors == 1 ? 3004 : 3005, email, null, LocalDateTime.now());
                         lblAlert.setVisible(true);
                         this.panel.repaint();
                     } else {
@@ -208,7 +208,6 @@ public class PasswordView extends Frame implements ActionListener {
                     }
                     this.typedPw = null;
                 } catch (Exception exception) {
-                    //todo log
                     lblAlert.setVisible(true);
                     this.panel.repaint();
                 }
