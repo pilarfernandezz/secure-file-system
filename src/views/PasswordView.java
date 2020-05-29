@@ -12,12 +12,10 @@ import java.util.List;
 import java.util.Random;
 
 public class PasswordView extends Frame implements ActionListener {
-    private static EmailView instance;
     private Font titleFont = new Font("Monospaced", Font.BOLD, 30);
     private JLabel lblTitle;
     private JLabel lblText;
     private JLabel lblEmail;
-    private JLabel lblPassword;
     private JLabel lblAlert;
     private static JTextField txtEmail = null;
     private static JPasswordField passPassword = null;

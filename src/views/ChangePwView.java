@@ -9,11 +9,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 public class ChangePwView extends Frame implements ActionListener {
-    private static ChangePwView instance;
     private Font titleFont = new Font("Monospaced", Font.BOLD, 30);
     private JLabel lblTitle;
     private JLabel lblText;
@@ -138,10 +136,6 @@ public class ChangePwView extends Frame implements ActionListener {
                 }
             } catch (FileNotFoundException | InvalidCertificateException | InvalidExtractionCertificateOwnerInfoException ex) {
                 lblAlertCert.setVisible(true);
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
-                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
-                System.exit(1);
             }
         } else if (e.getSource() == btnReturn) {
             Facade.registerLogMessage(7006, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());

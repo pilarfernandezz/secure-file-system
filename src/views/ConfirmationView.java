@@ -7,12 +7,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Map;
 
 public class ConfirmationView extends Frame implements ActionListener {
-    private static ConfirmationView instance;
     private Font titleFont = new Font("Monospaced", Font.BOLD, 30);
     private static String password;
     private static String passwordConfirmation;
@@ -33,7 +31,7 @@ public class ConfirmationView extends Frame implements ActionListener {
     private static JButton btnReturn;
     private static boolean register;
 
-    public ConfirmationView() throws InvalidExtractionCertificateOwnerInfoException, SQLException {
+    public ConfirmationView() throws InvalidExtractionCertificateOwnerInfoException {
         super();
 
         this.certInfo = Facade.extractCertificate(certificatePath);
@@ -116,8 +114,6 @@ public class ConfirmationView extends Frame implements ActionListener {
                     Facade.updateUser(certificatePath, password, passwordConfirmation);
                 }
                 MenuView.showScreen();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -125,16 +121,12 @@ public class ConfirmationView extends Frame implements ActionListener {
             Facade.registerLogMessage(register ? 6006 : 7005, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
             this.setVisible(false);
             this.dispose();
-            try {
-                if (register) RegisterView.showScreen(certificatePath, group, password, passwordConfirmation);
-                else ChangePwView.showScreen(certificatePath, password, passwordConfirmation);
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
+            if (register) RegisterView.showScreen(certificatePath, group, password, passwordConfirmation);
+            else ChangePwView.showScreen(certificatePath, password, passwordConfirmation);
         }
     }
 
-    public static void showScreen(boolean register, String certificatePath, String group, String password, String passwordConfirmation) throws InvalidExtractionCertificateOwnerInfoException, SQLException {
+    public static void showScreen(boolean register, String certificatePath, String group, String password, String passwordConfirmation) throws InvalidExtractionCertificateOwnerInfoException {
         ConfirmationView.register = register;
         ConfirmationView.certificatePath = certificatePath;
         ConfirmationView.group = group;
