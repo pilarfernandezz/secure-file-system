@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.time.LocalDateTime;
 
 public class TableView extends JPanel implements MouseListener {
     private JLabel table[][];
@@ -71,17 +72,25 @@ public class TableView extends JPanel implements MouseListener {
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getSource() instanceof JLabel) {
+            Facade.registerLogMessage(8010, Facade.getLoggedUser().getEmail(), ((JLabel) e.getSource()).getText(), LocalDateTime.now());
+
             String nameEncoded = null;
             for (int i = 0; i < this.index.length; i++) {
                 System.out.println(this.index[i][1] + " " + this.index[i][0]);
                 if (this.index[i][1].equals(((JLabel) e.getSource()).getText())) {
-                    nameEncoded = this.index[i][0];
-                    System.out.println(nameEncoded);
-                    break;
+                    if (Facade.getLoggedUser().getName().equals(this.index[i][1]) || Facade.getLoggedUser().getGroup().equals(this.index[i][2])) {
+                        Facade.registerLogMessage(8011, Facade.getLoggedUser().getEmail(), ((JLabel) e.getSource()).getText(), LocalDateTime.now());
+                        nameEncoded = this.index[i][0];
+                        System.out.println(nameEncoded);
+                        break;
+                    } else {
+                        Facade.registerLogMessage(8012, Facade.getLoggedUser().getEmail(), ((JLabel) e.getSource()).getText(), LocalDateTime.now());
+                        JOptionPane.showMessageDialog(null, "Arquivo " + ((JLabel) e.getSource()).getText() + " não pode ser decriptado. Acesso negado.");
+                    }
                 }
             }
             try {
-                if (Facade.decryptFile(Facade.getLoggedUser().getEmail(), path + "/" + nameEncoded, true, ((JLabel) e.getSource()).getText()) != null) {
+                if (nameEncoded != null && Facade.decryptFile(Facade.getLoggedUser().getEmail(), path + "/" + nameEncoded, true, ((JLabel) e.getSource()).getText()) != null) {
                     JOptionPane.showMessageDialog(null, "Arquivo " + ((JLabel) e.getSource()).getText() + " decriptado e salvo com sucesso.");
                 }
                 //todo log

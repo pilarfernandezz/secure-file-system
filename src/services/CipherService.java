@@ -4,6 +4,7 @@ import exceptions.InvalidDecryptFileException;
 import exceptions.InvalidDigitalEnvelopeException;
 import exceptions.InvalidFileContentException;
 import exceptions.InvalidKeyPairException;
+import facade.Facade;
 import models.User;
 
 import javax.crypto.*;
@@ -12,7 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.*;
-import java.security.cert.X509Certificate;
+import java.time.LocalDateTime;
 
 public class CipherService {
     private static CipherService instance;
@@ -48,7 +49,7 @@ public class CipherService {
                 System.out.println("Semente do arquivo " + fileName + " obtida com sucesso.");
 
                 System.out.println("Decriptando arquivo " + fileName + "...");
-                byte[] decripted = this.decrypt(user.getPbcKey(), fileName.concat(".enc"), fileName.concat(".asd"));
+                byte[] decripted = this.decrypt(user.getPbcKey(), fileName.concat(".enc"), fileName.concat(".asd"), save);
 
                 if (decripted != null) {
                     System.out.println("Arquivo " + fileName + " decriptado com sucesso.");
@@ -62,18 +63,14 @@ public class CipherService {
 
                     return decripted;
                 } else {
-                    //TODO LOG
                     throw new InvalidDecryptFileException("Falha na decriptação do arquivo " + fileName + ".");
                 }
             } else {
-                //todo log
                 throw new InvalidKeyPairException("Par de chaves é inválido.");
             }
         } catch (InvalidKeyException | InvalidKeyPairException | InvalidDigitalEnvelopeException e) {
-            //todo log
             throw new InvalidKeyException("Ocorreu um erro ao validar as chaves: " + e.getMessage());
         } catch (InvalidDecryptFileException | InvalidFileContentException | IOException e) {
-            //todo log
             throw new InvalidDecryptFileException("Ocorreu um erro ao decriptar o arquivo: " + e.getMessage());
         } catch (NoSuchAlgorithmException e) {
             throw new InvalidDecryptFileException("Arquivo não pode ser decriptado pois não pertence ao dono das credenciais fornecidas.");
@@ -81,7 +78,7 @@ public class CipherService {
     }
 
     // recebe um arquivo criptografado, decripta e retorna seu conteúdo em um novo arquivo
-    private byte[] decrypt(PublicKey publicKey, String path, String signPath) throws InvalidFileContentException, InvalidDecryptFileException {
+    private byte[] decrypt(PublicKey publicKey, String path, String signPath, boolean save) throws InvalidFileContentException, InvalidDecryptFileException {
         try {
             FileInputStream file = new FileInputStream((new File(path)));
             byte[] buffer = new byte[file.available()];
@@ -95,12 +92,19 @@ public class CipherService {
 
             cipher.init(Cipher.DECRYPT_MODE, keyGenerator.generateKey());
             byte[] decripted = cipher.doFinal(buffer);
-            if (decripted != null && verifyFileContentIntegrity(publicKey, decripted, signPath)) {
-                return decripted;
+            if (decripted != null) {
+                Facade.registerLogMessage(!save ? 8005 : 8013, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+                if (verifyFileContentIntegrity(publicKey, decripted, signPath)) {
+                    Facade.registerLogMessage(!save ? 8006 : 8014, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+                    return decripted;
+                } else {
+                    Facade.registerLogMessage(!save ? 8008 : 8016, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+                }
             } else {
-
+                Facade.registerLogMessage(!save ? 8007 : 8015, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
                 throw new InvalidFileContentException("Arquivo " + path + " inválido ou corrompido.");
             }
+            return null;
         } catch (InvalidFileContentException | IOException | InvalidKeyException e) {
             throw new InvalidFileContentException("Ocorreu um erro ao decriptar o arquivo: " + e.getMessage());
         } catch (NoSuchAlgorithmException | IllegalBlockSizeException | BadPaddingException e) {

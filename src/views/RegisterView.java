@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 public class RegisterView extends Frame implements ActionListener {
     private static RegisterView instance;
@@ -125,10 +126,15 @@ public class RegisterView extends Frame implements ActionListener {
         this.setVisible(true);
     }
 
+    public static void showScreen() throws SQLException {
+        Facade.registerLogMessage(6001, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+        new RegisterView();
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnRegister) {
+            Facade.registerLogMessage(6002, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
             try {
                 boolean invalidPw = password.getText().length() < 6 || password.getText().length() > 8 || !password.getText().matches("[0-9]+") || !Facade.validatePassword(password.getText());
                 boolean invalidCert = certificatePath.getText().trim().equals("") || certificatePath.getText() == null || !Facade.validateCertificate(certificatePath.getText());
@@ -136,18 +142,18 @@ public class RegisterView extends Frame implements ActionListener {
                 lblAlertCert.setVisible(invalidCert);
                 this.panel.repaint();
 
-                if (!invalidCert && !invalidPw) {
+                if (!invalidCert || !invalidPw) {
+                    Facade.registerLogMessage(invalidPw ? 6003 : 6004, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
                     this.setVisible(false);
                     this.dispose();
                     try {
-                        //todo log
                         ConfirmationView.showScreen(true, certificatePath.getText(), (btnuser.isSelected() ? "Usuário" : "Administrador"), password.getText(), passwordConfirmation.getText());
                     } catch (InvalidExtractionCertificateOwnerInfoException ex) {
                         //todo log
                         lblAlertCert.setVisible(true);
-                    } catch (SQLException invalidExtractionCertificateOwnerInfoException){
-                        //todo log
+                    } catch (SQLException invalidExtractionCertificateOwnerInfoException) {
                         JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                        Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
                         System.exit(1);
                     }
                 }
@@ -156,23 +162,20 @@ public class RegisterView extends Frame implements ActionListener {
                 lblAlertCert.setVisible(true);
             }
         } else if (e.getSource() == btnReturn) {
+            Facade.registerLogMessage(6007, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
             this.setVisible(false);
             this.dispose();
             try {
                 MenuView.showScreen();
             } catch (SQLException throwables) {
-                //todo log
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
                 System.exit(1);
             } catch (Exception exception) {
-                //todo log
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
                 System.exit(1);
             }
         }
-    }
-
-    public static void showScreen() throws SQLException {
-        new RegisterView();
     }
 }

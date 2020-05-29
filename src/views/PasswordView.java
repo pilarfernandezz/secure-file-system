@@ -6,12 +6,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.List;
+import java.util.Random;
 
 public class PasswordView extends Frame implements ActionListener {
     private static EmailView instance;
@@ -27,7 +25,7 @@ public class PasswordView extends Frame implements ActionListener {
     private static JButton btnCancel;
     private static String email;
     private static int passwordErrors = 0;
-    private int [] numbers;
+    private int[] numbers;
     private JButton btn1;
     private JButton btn2;
     private JButton btn3;
@@ -36,7 +34,7 @@ public class PasswordView extends Frame implements ActionListener {
     private JButton btndelete;
     private List<int[]> typedPw;
 
-    public PasswordView() throws SQLException {
+    public PasswordView() {
         super();
 
         this.setBackground(Color.WHITE);
@@ -117,15 +115,16 @@ public class PasswordView extends Frame implements ActionListener {
         this.setVisible(true);
     }
 
-    public static void showScreen(String email) throws SQLException {
+    public static void showScreen(String email) {
+        Facade.registerLogMessage(3001, email, null, LocalDateTime.now());
         PasswordView.email = email;
         new PasswordView();
     }
 
-    public int[] generateOrder(){
+    public int[] generateOrder() {
         int index, temp;
         int[] array = new int[10];
-        for (int i = 0 ; i < 10 ; i++) array[i] = i;
+        for (int i = 0; i < 10; i++) array[i] = i;
         Random random = new Random();
         for (int i = array.length - 1; i > 0; i--) {
             index = random.nextInt(i + 1);
@@ -137,7 +136,7 @@ public class PasswordView extends Frame implements ActionListener {
         return array;
     }
 
-    public void changeButtons(){
+    public void changeButtons() {
         btn1.setText(numbers[0] + " ou " + numbers[1]);
         btn2.setText(numbers[2] + " ou " + numbers[3]);
         btn3.setText(numbers[4] + " ou " + numbers[5]);
@@ -147,15 +146,15 @@ public class PasswordView extends Frame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == btndelete){
+        if (e.getSource() == btndelete) {
             passPassword.setText("");
             this.typedPw = null;
             this.panel.repaint();
         }
 
-        if(e.getSource() == btn1 ||e.getSource() == btn2 || e.getSource() == btn3 || e.getSource() == btn4 || e.getSource() == btn5 ){
-            String[] nums = ((JButton)e.getSource()).getText().split(" ou ");
-            if(this.typedPw == null){
+        if (e.getSource() == btn1 || e.getSource() == btn2 || e.getSource() == btn3 || e.getSource() == btn4 || e.getSource() == btn5) {
+            String[] nums = ((JButton) e.getSource()).getText().split(" ou ");
+            if (this.typedPw == null) {
                 this.typedPw = new ArrayList<>();
             }
 
@@ -171,47 +170,51 @@ public class PasswordView extends Frame implements ActionListener {
                 this.changeButtons();
                 this.panel.repaint();
             } catch (Exception exception) {
-                exception.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
+                System.exit(1);
             }
         }
 
-        if(e.getSource() == btnStart){
+        if (e.getSource() == btnStart) {
             lblAlert.setVisible(false);
 
-            if(this.passwordErrors > 2){
-                this.passwordErrors=0;
+            if (this.passwordErrors > 2) {
+                this.passwordErrors = 0;
+                Facade.registerLogMessage(3006, email, null, LocalDateTime.now());
                 try {
                     JOptionPane.showMessageDialog(null, "Usuário foi bloqueado por 2 minutos por exceder as tentativas de autenticação.");
                     Facade.lockUser(this.email);
+                    Facade.registerLogMessage(3007, email, null, LocalDateTime.now());
                     EmailView.showScreen();
                 } catch (Exception exception) {
-                    //todo log
                     JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                    Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
                     System.exit(1);
                 }
             } else {
                 try {
-                    if (typedPw==null || typedPw.size() == 0 || !Facade.verifyPassword(typedPw, this.email)){
+                    if (typedPw == null || typedPw.size() == 0 || !Facade.verifyPassword(typedPw, this.email)) {
                         this.passwordErrors++;
+                        Facade.registerLogMessage(this.passwordErrors == 1? 3004 : 3005, email, null, LocalDateTime.now());
                         lblAlert.setVisible(true);
                         this.panel.repaint();
                     } else {
                         this.setVisible(false);
                         this.dispose();
+                        Facade.registerLogMessage(3003, email, null, LocalDateTime.now());
+                        Facade.registerLogMessage(3002, email, null, LocalDateTime.now());
                         PvtKeyView.showScreen(this.email);
                     }
                     this.typedPw = null;
-                } catch (SQLException throwables) {
-                    //todo log
-                    JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
-                    System.exit(1);
                 } catch (Exception exception) {
                     //todo log
                     lblAlert.setVisible(true);
                     this.panel.repaint();
                 }
             }
-        } else if(e.getSource() == btnCancel){
+        } else if (e.getSource() == btnCancel) {
+            Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
             System.exit(1);
         }
     }

@@ -1,31 +1,28 @@
 package views;
 
 import facade.Facade;
-import models.User;
 
-import javax.net.ssl.SSLContext;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 public class PvtKeyView extends Frame implements ActionListener {
-    private static PvtKeyView instance;
     private Font titleFont = new Font("Monospaced", Font.BOLD, 30);
     private JLabel lblTitle;
     private JLabel lblText;
     private JLabel lblPath;
     private JLabel lblAlert;
     private JLabel lblSecret;
-    private  JPasswordField txtSecret;
+    private JPasswordField txtSecret;
     private static JTextField txtPath = null;
     private static JButton btnStart;
     private static JButton btnCancel;
     private static String email;
     private static int keyErrors = 0;
 
-    public PvtKeyView() throws SQLException {
+    public PvtKeyView() {
         super();
 
         this.setBackground(Color.WHITE);
@@ -83,38 +80,46 @@ public class PvtKeyView extends Frame implements ActionListener {
         this.setVisible(true);
     }
 
-    public static void showScreen(String email) throws SQLException {
+    public static void showScreen(String email) {
+        Facade.registerLogMessage(4001, email, null, LocalDateTime.now());
         PvtKeyView.email = email;
         new PvtKeyView();
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == btnStart){
+        if (e.getSource() == btnStart) {
             lblAlert.setVisible(false);
 
             try {
-                if(this.keyErrors > 2){
-                    this.keyErrors=0;
+                if (this.keyErrors > 2) {
+                    this.keyErrors = 0;
                     try {
                         JOptionPane.showMessageDialog(null, "Usuário foi bloqueado por 2 minutos por exceder as tentativas de autenticação.");
 
                         Facade.lockUser(this.email);
+                        Facade.registerLogMessage(4007, email, null, LocalDateTime.now());
                         EmailView.showScreen();
                     } catch (Exception exception) {
-                        //todo log
                         JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                        Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
                         System.exit(1);
                     }
                 } else {
-                    if(txtPath.getText() == null || txtPath.getText().trim().equals("") || txtSecret.getText().trim().equals("") || txtSecret.getText() == null || !Facade.keysValidation(this.email, txtPath.getText(),txtSecret.getText())){
+                    boolean invalidPath = txtPath.getText() == null || txtPath.getText().trim().equals("");
+                    boolean invalidSecret = txtSecret.getText().trim().equals("") || txtSecret.getText() == null;
+                    boolean invalidKeys = !Facade.keysValidation(this.email, txtPath.getText(), txtSecret.getText());
+                    if (invalidPath || invalidSecret || invalidKeys) {
+                        Facade.registerLogMessage(invalidPath ? 4004 : (invalidSecret ? 4005 : 4006), email, null, LocalDateTime.now());
                         lblAlert.setVisible(true);
                         this.keyErrors++;
                         this.panel.repaint();
-                    } else{
+                    } else {
                         this.setVisible(false);
                         this.dispose();
-                        Facade.makeUserLogged(this.email, txtPath.getText(),txtSecret.getText());
+                        Facade.makeUserLogged(this.email, txtPath.getText(), txtSecret.getText());
+                        Facade.registerLogMessage(4003, email, null, LocalDateTime.now());
+                        Facade.registerLogMessage(4002, email, null, LocalDateTime.now());
                         MenuView.showScreen();
                         //todo log
                     }
@@ -124,7 +129,8 @@ public class PvtKeyView extends Frame implements ActionListener {
                 this.keyErrors++;
                 //todo log
             }
-        } else if(e.getSource() == btnCancel){
+        } else if (e.getSource() == btnCancel) {
+            Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
             System.exit(1);
         }
     }

@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 public class ExitView extends Frame implements ActionListener {
     private Font titleFont = new Font("Monospaced", Font.BOLD, 30);
@@ -17,7 +18,7 @@ public class ExitView extends Frame implements ActionListener {
     private static JButton btnExit;
     private static JButton btnReturn;
 
-    public ExitView() throws SQLException {
+    public ExitView() {
         super();
 
         this.setBackground(Color.WHITE);
@@ -61,8 +62,10 @@ public class ExitView extends Frame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnExit) {
+            Facade.registerLogMessage(9003, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
             System.exit(0);
         } else if (e.getSource() == btnReturn) {
+            Facade.registerLogMessage(9004, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
             this.setVisible(false);
             this.dispose();
             try {
@@ -79,7 +82,8 @@ public class ExitView extends Frame implements ActionListener {
         }
     }
 
-    public static void showScreen() throws SQLException {
+    public static void showScreen() {
+        Facade.registerLogMessage(9001, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
         new ExitView();
     }
 }

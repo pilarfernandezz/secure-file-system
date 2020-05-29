@@ -1,16 +1,14 @@
 package views;
 
 import facade.Facade;
-import models.User;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 public class EmailView extends Frame implements ActionListener {
-    private static EmailView instance;
     private Font titleFont = new Font("Monospaced", Font.BOLD, 30);
     private JLabel lblTitle;
     private JLabel lblText;
@@ -21,7 +19,7 @@ public class EmailView extends Frame implements ActionListener {
     private static JButton btnStart;
     private static JButton btnCancel;
 
-    public EmailView() throws SQLException {
+    public EmailView() {
         super();
 
         this.setBackground(Color.WHITE);
@@ -76,7 +74,8 @@ public class EmailView extends Frame implements ActionListener {
         this.setVisible(true);
     }
 
-    public static void showScreen() throws SQLException {
+    public static void showScreen() {
+        Facade.registerLogMessage(2001, null, null, LocalDateTime.now());
         new EmailView();
     }
 
@@ -89,28 +88,29 @@ public class EmailView extends Frame implements ActionListener {
             try {
                 if (Facade.checkEmail(this.txtEmail.getText())) {
                     if (Facade.verifyIsLocked(this.txtEmail.getText())) {
+                        Facade.registerLogMessage(2004, this.txtEmail.getText(), null, LocalDateTime.now());
                         lblAlert1.setVisible(true);
                         this.panel.repaint();
                     } else {
                         this.setVisible(false);
                         this.dispose();
+                        Facade.registerLogMessage(2003, this.txtEmail.getText(), null, LocalDateTime.now());
+                        Facade.registerLogMessage(2002, null, null, LocalDateTime.now());
                         PasswordView.showScreen(this.txtEmail.getText());
                     }
                 } else {
+                    Facade.registerLogMessage(2005, this.txtEmail.getText(), null, LocalDateTime.now());
                     lblAlert.setVisible(true);
                     this.panel.repaint();
                 }
-            } catch (SQLException throwables) {
-                //todo log
-                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
-                System.exit(1);
             } catch (Exception exception) {
-                //todo log
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
                 System.exit(1);
             }
         } else if (e.getSource() == btnCancel) {
-            System.exit(1);
+            Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
+            System.exit(0);
         }
     }
 }

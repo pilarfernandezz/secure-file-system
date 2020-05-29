@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 public class ChangePwView extends Frame implements ActionListener {
     private static ChangePwView instance;
@@ -101,6 +102,11 @@ public class ChangePwView extends Frame implements ActionListener {
         this.setVisible(true);
     }
 
+    public static void showScreen() throws SQLException {
+        Facade.registerLogMessage(7001, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
+        new ChangePwView();
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnRegister) {
@@ -114,31 +120,32 @@ public class ChangePwView extends Frame implements ActionListener {
                 lblAlertCert.setVisible(invalidCert);
                 this.panel.repaint();
 
-                if (!invalidCert && !invalidPw) {
+                if (!invalidCert || !invalidPw) {
+                    Facade.registerLogMessage(invalidPw ? 7002 : 7003, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
                     this.setVisible(false);
                     this.dispose();
                     ConfirmationView.showScreen(false, certificatePath.getText(), null, password.getText(), passwordConfirmation.getText());
                 }
             } catch (FileNotFoundException | InvalidCertificateException | InvalidExtractionCertificateOwnerInfoException ex) {
-                System.out.println("aqui " + ex.getMessage());
                 lblAlertCert.setVisible(true);
             } catch (SQLException ex) {
-                //todo log
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
                 System.exit(1);
             }
         } else if (e.getSource() == btnReturn) {
+            Facade.registerLogMessage(7006, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
             this.setVisible(false);
             this.dispose();
             try {
                 MenuView.showScreen();
             } catch (Exception throwables) {
-                throwables.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
+                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
+                System.exit(1);
             }
         }
     }
 
-    public static void showScreen() throws SQLException {
-        new ChangePwView();
-    }
+
 }
