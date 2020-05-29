@@ -1,0 +1,12 @@
+.idea/*
+*.iml
+Files/*
+Keys/*
+*.asd
+*.enc
+*.env
+*.key
+*.crt
+*.class
+out/*
+.DS_Store
