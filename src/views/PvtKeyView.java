@@ -23,6 +23,7 @@ public class PvtKeyView extends Frame implements ActionListener {
     private static JButton btnStart;
     private static JButton btnCancel;
     private static String email;
+    private static int keyErrors = 0;
 
     public PvtKeyView() throws SQLException {
         super();
@@ -43,7 +44,8 @@ public class PvtKeyView extends Frame implements ActionListener {
         lblPath.setBounds(150, 150, 300, 50);
         this.panel.add(lblPath);
 
-        txtPath = new JTextField();
+        //TODO TIRAR PVT KEY
+        txtPath = new JTextField("Keys/user01-pkcs8-des.key");
         txtPath.setBounds(360, 160, 200, 30);
         this.panel.add(txtPath);
 
@@ -57,7 +59,8 @@ public class PvtKeyView extends Frame implements ActionListener {
         lblSecret.setBounds(150, 190, 300, 50);
         this.panel.add(lblSecret);
 
-        txtSecret = new JPasswordField();
+        //TODO TIRAR USER01
+        txtSecret = new JPasswordField("user01");
         txtSecret.setBounds(360, 200, 200, 30);
         this.panel.add(txtSecret);
 
@@ -88,17 +91,34 @@ public class PvtKeyView extends Frame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == btnStart){
+            lblAlert.setVisible(false);
+
             try {
-                if(txtPath.getText() == null || txtPath.getText().equals("") || !Facade.getFacadeInstance().keysValidation(this.email, txtPath.getText(),txtSecret.getText())){
-                    lblAlert.setVisible(true);
-                    this.panel.repaint();
-                } else{
-                    this.setVisible(false);
-                    this.dispose();
-                    Facade.getFacadeInstance().makeUserLogged(this.email, txtPath.getText(),txtSecret.getText());
-                    MenuView.showScreen();
+                if(this.keyErrors > 2){
+                    this.keyErrors=0;
+                    try {
+                        JOptionPane.showMessageDialog(null, "Usuário foi bloqueado por 2 minutos por exceder as tentativas de autenticação.");
+
+                        Facade.lockUser(this.email);
+                        EmailView.showScreen();
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
+                    }
+                } else {
+                    if(txtPath.getText() == null || txtPath.getText().trim().equals("") || txtSecret.getText().trim().equals("") || txtSecret.getText() == null || !Facade.keysValidation(this.email, txtPath.getText(),txtSecret.getText())){
+                        lblAlert.setVisible(true);
+                        this.keyErrors++;
+                        this.panel.repaint();
+                    } else{
+                        this.setVisible(false);
+                        this.dispose();
+                        Facade.makeUserLogged(this.email, txtPath.getText(),txtSecret.getText());
+                        MenuView.showScreen();
+                    }
                 }
             } catch (Exception exception) {
+                lblAlert.setVisible(true);
+                this.keyErrors++;
                 exception.printStackTrace();
             }
         } else if(e.getSource() == btnCancel){

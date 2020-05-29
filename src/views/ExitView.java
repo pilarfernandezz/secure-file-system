@@ -41,7 +41,7 @@ public class ExitView extends Frame implements ActionListener {
         lblText.setBounds(340, -120, 800, 600);
         this.panel.add(lblText);
 
-        lblConfirmation = new JLabel("Deseja realmente sair?");
+        lblConfirmation = new JLabel("Pressione o botão Sair para confirmar.");
         lblConfirmation.setBounds(320, 190, 300, 50);
         this.panel.add(lblConfirmation);
 

@@ -11,20 +11,11 @@ import views.EmailView;
 
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
 public class Facade {
-    private static Facade instancia;
-
-    public static Facade getFacadeInstance() {
-        if (instancia == null)
-            instancia = new Facade();
-        return instancia;
-    }
-
     public static void start() throws SQLException {
         new EmailView();
     }
@@ -43,7 +34,7 @@ public class Facade {
     }
 
     public static Map<String, String> extractCertificate(String path) throws InvalidExtractionCertificateOwnerInfoException {
-        return DigitalCertificateService.getInstance().extractCertificateOwnerInfo(path,true);
+        return DigitalCertificateService.getInstance().extractCertificateOwnerInfo(path, true);
     }
 
     public static User getLoggedUser() throws SQLException {
@@ -71,27 +62,30 @@ public class Facade {
     }
 
     public static boolean verifyPassword(List<int[]> typedPw, String email) throws Exception {
-        return AuthenticationService.getAuthenticationInstance().verifyPassword(typedPw,email);
+        return AuthenticationService.getAuthenticationInstance().verifyPassword(typedPw, email);
     }
 
-    public static void makeUserLogged(String email,String path, String secret) throws Exception {
-        AuthenticationService.getAuthenticationInstance().makeUserLogged(email,path,secret);
-    }
-
-    public static int getRowSize(){
-        return 3;
-        //TODO DESMARRETAR
+    public static void makeUserLogged(String email, String path, String secret) throws Exception {
+        AuthenticationService.getAuthenticationInstance().makeUserLogged(email, path, secret);
     }
 
     public static byte[] decryptFile(String email, String fileName, boolean save, String newFileName) throws Exception {
         return CipherService.getInstance().decryptFileContent(Facade.findUser(email), fileName, save, newFileName);
     }
 
-    public static String [][] getIndexInfo(byte[] index) throws UnsupportedEncodingException {
+    public static String[][] getIndexInfo(byte[] index) throws UnsupportedEncodingException {
         return IndexService.getInstance().getIndexInfo(index);
     }
 
     public static boolean keysValidation(String email, String path, String secret) throws Exception {
         return AuthenticationService.getAuthenticationInstance().keysValidation(email, path, secret);
+    }
+
+    public static boolean validatePassword(String pw) throws SQLException {
+        return AuthenticationService.getAuthenticationInstance().validatePassword(pw);
+    }
+
+    public static boolean validateCertificate(String path) throws SQLException, FileNotFoundException, InvalidCertificateException {
+        return DigitalCertificateService.getInstance().loadCertificate(path, true) != null ? true : false;
     }
 }

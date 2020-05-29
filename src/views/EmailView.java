@@ -40,7 +40,8 @@ public class EmailView extends Frame implements ActionListener {
         lblEmail.setBounds(250, 150, 100, 50);
         this.panel.add(lblEmail);
 
-        txtEmail = new JTextField();
+        //TODO TIRAR EMAIL
+        txtEmail = new JTextField("user01@inf1416.puc-rio.br");
         txtEmail.setBounds(320, 160, 200, 30);
         this.panel.add(txtEmail);
 
@@ -82,9 +83,12 @@ public class EmailView extends Frame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == btnStart){
+            lblAlert.setVisible(false);
+            lblAlert1.setVisible(false);
+
             try {
-                if(Facade.getFacadeInstance().checkEmail(this.txtEmail.getText())){
-                    if(Facade.getFacadeInstance().verifyIsLocked(this.txtEmail.getText())){
+                if(Facade.checkEmail(this.txtEmail.getText())){
+                    if(Facade.verifyIsLocked(this.txtEmail.getText())){
                         lblAlert1.setVisible(true);
                         this.panel.repaint();
                     } else {

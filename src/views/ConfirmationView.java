@@ -10,8 +10,8 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.Map;
 
-public class RegisterConfirmationView extends Frame implements ActionListener {
-    private static RegisterConfirmationView instance;
+public class ConfirmationView extends Frame implements ActionListener {
+    private static ConfirmationView instance;
     private Font titleFont = new Font("Monospaced", Font.BOLD, 30);
     private static String password;
     private static String passwordConfirmation;
@@ -23,6 +23,8 @@ public class RegisterConfirmationView extends Frame implements ActionListener {
     private JLabel lblTitle;
     private JLabel lblText;
     private JLabel lblTotal;
+    private JLabel lblEmail;
+    private JLabel lblName;
     private JLabel lblTotalQtd;
     private Map<String, String> certInfo;
     private JLabel lblVersion;
@@ -32,12 +34,13 @@ public class RegisterConfirmationView extends Frame implements ActionListener {
     private JLabel lblSignType;
     private static JButton btnRegister;
     private static JButton btnReturn;
+    private static boolean register;
     private int totalQtd =0;
 
-    public RegisterConfirmationView() throws InvalidExtractionCertificateOwnerInfoException, SQLException {
+    public ConfirmationView() throws InvalidExtractionCertificateOwnerInfoException, SQLException {
         super();
 
-        this.certInfo = Facade.getFacadeInstance().extractCertificate(certificatePath);
+        this.certInfo = Facade.extractCertificate(certificatePath);
 
         this.setBackground(Color.WHITE);
 
@@ -51,7 +54,7 @@ public class RegisterConfirmationView extends Frame implements ActionListener {
         lblTotal.setBounds(280, -160, 800, 600);
         this.panel.add(lblTotal);
 
-        lblTotalQtd = new JLabel(String.valueOf(Facade.getFacadeInstance().getNumberOfUsersRegistered()));
+        lblTotalQtd = new JLabel(String.valueOf(Facade.getNumberOfUsersRegistered()));
         lblTotalQtd.setBounds(470, -160, 800, 600);
         this.panel.add(lblTotalQtd);
 
@@ -59,7 +62,7 @@ public class RegisterConfirmationView extends Frame implements ActionListener {
         lblText.setBounds(300, -120, 800, 600);
         this.panel.add(lblText);
 
-        lblCertificate = new JLabel("Caminho do certificado digital: " + RegisterConfirmationView.certificatePath );
+        lblCertificate = new JLabel("Caminho do certificado digital: " + ConfirmationView.certificatePath );
         lblCertificate.setBounds(110, 215, 500, 20);
         this.panel.add(lblCertificate);
 
@@ -83,8 +86,16 @@ public class RegisterConfirmationView extends Frame implements ActionListener {
         lblValidUntil.setBounds(110, 315, 500, 20);
         this.panel.add(lblValidUntil);
 
-        lblGroup = new JLabel("Grupo: " + RegisterConfirmationView.group);
+        lblGroup = new JLabel("Grupo: " + ConfirmationView.group);
         lblGroup.setBounds(110, 340, 300, 20);
+        this.panel.add(lblGroup);
+
+        lblValidUntil = new JLabel("Email: " + this.certInfo.get("EMAILADDRESS"));
+        lblValidUntil.setBounds(110, 365, 500, 20);
+        this.panel.add(lblValidUntil);
+
+        lblGroup = new JLabel("Nome: " + this.certInfo.get("CN"));
+        lblGroup.setBounds(110, 390, 300, 20);
         this.panel.add(lblGroup);
 
         btnRegister = new JButton("Registrar");
@@ -111,13 +122,11 @@ public class RegisterConfirmationView extends Frame implements ActionListener {
             this.setVisible(false);
             this.dispose();
             try {
-                Facade.getFacadeInstance().registerUser(certificatePath, group, password, passwordConfirmation);
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
-            try {
+                if(register) {
+                    Facade.registerUser(certificatePath, group, password, passwordConfirmation);
+                } else {
+                    Facade.updateUser(certificatePath, password, passwordConfirmation);
+                }
                 MenuView.showScreen();
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
@@ -135,12 +144,13 @@ public class RegisterConfirmationView extends Frame implements ActionListener {
         }
     }
 
-    public static void showScreen(String certificatePath,String group, String password, String passwordConfirmation) throws InvalidExtractionCertificateOwnerInfoException, SQLException {
-        RegisterConfirmationView.certificatePath = certificatePath;
-        RegisterConfirmationView.group = group;
-        RegisterConfirmationView.password = password;
-        RegisterConfirmationView.passwordConfirmation = passwordConfirmation;
-        new RegisterConfirmationView();
+    public static void showScreen(boolean register,String certificatePath,String group, String password, String passwordConfirmation) throws InvalidExtractionCertificateOwnerInfoException, SQLException {
+        ConfirmationView.register = register;
+        ConfirmationView.certificatePath = certificatePath;
+        ConfirmationView.group = group;
+        ConfirmationView.password = password;
+        ConfirmationView.passwordConfirmation = passwordConfirmation;
+        new ConfirmationView();
     }
 
     public int getTotalQtd() {

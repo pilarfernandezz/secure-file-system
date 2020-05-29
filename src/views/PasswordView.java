@@ -176,25 +176,27 @@ public class PasswordView extends Frame implements ActionListener {
         }
 
         if(e.getSource() == btnStart){
+            lblAlert.setVisible(false);
+
             if(this.passwordErrors > 2){
                 this.passwordErrors=0;
                 try {
-                    //TODO avisar que foi bloqueado usando JoptionPane
-                    Facade.getFacadeInstance().lockUser(this.email);
+                    JOptionPane.showMessageDialog(null, "Usuário foi bloqueado por 2 minutos por exceder as tentativas de autenticação.");
+                    Facade.lockUser(this.email);
                     EmailView.showScreen();
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
             } else {
                 try {
-                    if (Facade.getFacadeInstance().verifyPassword(typedPw, this.email)){
-                        this.setVisible(false);
-                        this.dispose();
-                        PvtKeyView.showScreen(this.email);
-                    } else {
+                    if (typedPw==null || typedPw.size() == 0 || !Facade.verifyPassword(typedPw, this.email)){
                         this.passwordErrors++;
                         lblAlert.setVisible(true);
                         this.panel.repaint();
+                    } else {
+                        this.setVisible(false);
+                        this.dispose();
+                        PvtKeyView.showScreen(this.email);
                     }
                     this.typedPw = null;
                 } catch (SQLException throwables) {
