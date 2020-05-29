@@ -172,7 +172,6 @@ public class AuthenticationService {
 
             if (lockedUser != null) {
                 LocalDateTime lockDate = lockedUser.getLockDate();
-                System.out.println(localDateTime.toString() + " " + lockDate.toString());
                 if (LocalDateTime.parse(LocalDateTime.now().toString()).minusMinutes(2).compareTo(lockedUser.getLockDate()) < 0) {
                     return true;
                 } else {

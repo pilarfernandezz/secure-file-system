@@ -2,10 +2,9 @@ package services;
 
 import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
 
-import javax.crypto.*;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.security.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class PasswordCipherService {
 
@@ -21,17 +20,17 @@ public class PasswordCipherService {
     private PasswordCipherService() throws Exception {
         try {
             this.md = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException e){
+        } catch (NoSuchAlgorithmException e) {
             throw new Exception("Ocorreu um erro ao encriptar a senha: " + e.getMessage());
         }
     }
 
     public String encryptPassword(String pwd) throws Exception {
-        try{
+        try {
             this.md.update(pwd.getBytes("UTF8"));
             byte[] digest = this.md.digest();
             return HexBin.encode(digest);
-        } catch(UnsupportedEncodingException e){
+        } catch (UnsupportedEncodingException e) {
             throw new Exception("Ocorreu um erro ao encriptar a senha: " + e.getMessage());
         }
     }

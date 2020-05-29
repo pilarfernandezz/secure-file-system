@@ -13,7 +13,6 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 public class RegisterView extends Frame implements ActionListener {
-    private static RegisterView instance;
     private Font titleFont = new Font("Monospaced", Font.BOLD, 30);
     private JLabel lblTitle;
     private JLabel lblText;
@@ -24,7 +23,6 @@ public class RegisterView extends Frame implements ActionListener {
     private JLabel lblAlertPw;
     private JLabel lblAlertCert;
     private JLabel lblTotal;
-    private JLabel lblTotalQtd;
     private static JRadioButton btnadministrator;
     private static JRadioButton btnuser;
     private static ButtonGroup btngroup;
@@ -33,8 +31,11 @@ public class RegisterView extends Frame implements ActionListener {
     private static JPasswordField passwordConfirmation = null;
     private static JButton btnRegister;
     private static JButton btnReturn;
+    private static String _password;
+    private static String _passwordConfirmation;
+    private static String _certificatePath;
 
-    public RegisterView() throws SQLException {
+    public RegisterView(String group) {
         super();
 
         this.setBackground(Color.WHITE);
@@ -45,13 +46,9 @@ public class RegisterView extends Frame implements ActionListener {
         this.panel.setBounds(0, 0, 800, 600);
         this.panel.add(lblTitle);
 
-        lblTotal = new JLabel("Total de usuários do sistema:");
+        lblTotal = new JLabel("Total de usuários do sistema: " + Facade.getNumberOfUsersRegistered());
         lblTotal.setBounds(280, -160, 800, 600);
         this.panel.add(lblTotal);
-
-        lblTotalQtd = new JLabel(String.valueOf(Facade.getNumberOfUsersRegistered()));
-        lblTotalQtd.setBounds(470, -160, 800, 600);
-        this.panel.add(lblTotalQtd);
 
         lblText = new JLabel("Cadastro:");
         lblText.setBounds(350, -120, 800, 600);
@@ -62,6 +59,7 @@ public class RegisterView extends Frame implements ActionListener {
         this.panel.add(lblCertificate);
 
         certificatePath = new JTextField();
+        if (_certificatePath != null) certificatePath.setText(_certificatePath);
         certificatePath.setBounds(250, 200, 500, 30);
         this.panel.add(certificatePath);
 
@@ -74,6 +72,8 @@ public class RegisterView extends Frame implements ActionListener {
         btnuser = new JRadioButton("Usuário");
         btnuser.setBounds(400, 250, 100, 30);
         btngroup = new ButtonGroup();
+        if (group != null && group.equals("Usuário")) btnuser.setSelected(true);
+        else if (group != null && group.equals("Administrador")) btnadministrator.setSelected(true);
         btngroup.add(btnadministrator);
         btngroup.add(btnuser);
         this.panel.add(btnuser);
@@ -84,6 +84,7 @@ public class RegisterView extends Frame implements ActionListener {
         this.panel.add(lblPassword);
 
         password = new JPasswordField(8);
+        if (_password != null) password.setText(_password);
         password.setBounds(250, 300, 500, 30);
         this.panel.add(password);
 
@@ -92,6 +93,7 @@ public class RegisterView extends Frame implements ActionListener {
         this.panel.add(lblPasswordConfirmation);
 
         passwordConfirmation = new JPasswordField(8);
+        if (_passwordConfirmation != null) passwordConfirmation.setText(_passwordConfirmation);
         passwordConfirmation.setBounds(250, 350, 500, 30);
         this.panel.add(passwordConfirmation);
 
@@ -125,9 +127,13 @@ public class RegisterView extends Frame implements ActionListener {
         this.setVisible(true);
     }
 
-    public static void showScreen() throws SQLException {
+    public static void showScreen(String certificatePath, String group, String password, String passwordConfirmation) {
+        _certificatePath = certificatePath;
+        _password = password;
+        _passwordConfirmation = passwordConfirmation;
+
         Facade.registerLogMessage(6001, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
-        new RegisterView();
+        new RegisterView(group);
     }
 
     @Override
@@ -165,15 +171,35 @@ public class RegisterView extends Frame implements ActionListener {
             this.dispose();
             try {
                 MenuView.showScreen();
-            } catch (SQLException throwables) {
-                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
-                Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
-                System.exit(1);
             } catch (Exception exception) {
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
                 Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
                 System.exit(1);
             }
         }
+    }
+
+    public static String get_password() {
+        return _password;
+    }
+
+    public static void set_password(String _password) {
+        RegisterView._password = _password;
+    }
+
+    public static String get_passwordConfirmation() {
+        return _passwordConfirmation;
+    }
+
+    public static void set_passwordConfirmation(String _passwordConfirmation) {
+        RegisterView._passwordConfirmation = _passwordConfirmation;
+    }
+
+    public static String get_certificatePath() {
+        return _certificatePath;
+    }
+
+    public static void set_certificatePath(String _certificatePath) {
+        RegisterView._certificatePath = _certificatePath;
     }
 }

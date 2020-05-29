@@ -103,6 +103,9 @@ public class ConfirmationView extends Frame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btnRegister) {
+            RegisterView.set_certificatePath(null);
+            RegisterView.set_password(null);
+            RegisterView.set_passwordConfirmation(null);
             Facade.registerLogMessage(register ? 6005 : 7004, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
             this.setVisible(false);
             this.dispose();
@@ -123,7 +126,8 @@ public class ConfirmationView extends Frame implements ActionListener {
             this.setVisible(false);
             this.dispose();
             try {
-                RegisterView.showScreen();
+                if (register) RegisterView.showScreen(certificatePath, group, password, passwordConfirmation);
+                else ChangePwView.showScreen(certificatePath, password, passwordConfirmation);
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }

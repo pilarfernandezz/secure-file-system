@@ -29,7 +29,6 @@ public class DigitalCertificateService {
     public X509Certificate loadCertificate(String cert, boolean isFile) throws FileNotFoundException, InvalidCertificateException {
         try {
             if (isFile) {
-                System.out.println(" load certificate " + cert);
                 return (X509Certificate) CertificateFactory.getInstance("X509")
                         .generateCertificate(new FileInputStream(new File(cert)));
             }

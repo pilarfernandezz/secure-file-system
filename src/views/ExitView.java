@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 public class ExitView extends Frame implements ActionListener {
@@ -70,9 +69,6 @@ public class ExitView extends Frame implements ActionListener {
             this.dispose();
             try {
                 MenuView.showScreen();
-            } catch (SQLException throwables) {
-                JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
-                System.exit(1);
             } catch (Exception exception) {
                 JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
                 System.exit(1);

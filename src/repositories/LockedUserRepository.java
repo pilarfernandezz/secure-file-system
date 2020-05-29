@@ -41,7 +41,7 @@ public class LockedUserRepository {
             LockedUser lockedUser = this.getLockedUser(email);
             String query = "update locked_users set  is_active = ? where user_id = ?";
             PreparedStatement ps = this.conn.prepareStatement(query);
-            ps.setInt(1, isActive?1:0);
+            ps.setInt(1, isActive ? 1 : 0);
             ps.setInt(2, lockedUser.getUserId());
 
             ps.execute();

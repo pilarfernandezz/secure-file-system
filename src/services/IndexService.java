@@ -1,8 +1,6 @@
 package services;
 
 import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class IndexService {
 
@@ -14,7 +12,8 @@ public class IndexService {
         return instance;
     }
 
-    private IndexService(){}
+    private IndexService() {
+    }
 
     public String[][] getIndexInfo(byte[] index) throws Exception {
         try {
@@ -29,7 +28,7 @@ public class IndexService {
                 indexInfo[i][3] = indexContentLines[i].split(" ")[3];
             }
             return indexInfo;
-        }catch (UnsupportedEncodingException e){
+        } catch (UnsupportedEncodingException e) {
             throw new Exception("Ocorreu um erro ao obter informações da pasta segura: " + e.getMessage());
         }
     }

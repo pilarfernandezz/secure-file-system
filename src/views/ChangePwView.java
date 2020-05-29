@@ -28,8 +28,11 @@ public class ChangePwView extends Frame implements ActionListener {
     private static JPasswordField passwordConfirmation = null;
     private static JButton btnRegister;
     private static JButton btnReturn;
+    private static String _password;
+    private static String _passwordConfirmation;
+    private static String _certificatePath;
 
-    public ChangePwView() throws SQLException {
+    public ChangePwView() {
         super();
 
         this.setBackground(Color.WHITE);
@@ -53,6 +56,7 @@ public class ChangePwView extends Frame implements ActionListener {
         this.panel.add(lblCertificate);
 
         certificatePath = new JTextField();
+        if (_certificatePath != null) certificatePath.setText(_certificatePath);
         certificatePath.setBounds(250, 200, 500, 30);
         this.panel.add(certificatePath);
 
@@ -61,6 +65,7 @@ public class ChangePwView extends Frame implements ActionListener {
         this.panel.add(lblPassword);
 
         password = new JPasswordField(8);
+        if (_password != null) password.setText(_password);
         password.setBounds(250, 250, 500, 30);
         this.panel.add(password);
 
@@ -69,6 +74,7 @@ public class ChangePwView extends Frame implements ActionListener {
         this.panel.add(lblPasswordConfirmation);
 
         passwordConfirmation = new JPasswordField(8);
+        if (_passwordConfirmation != null) passwordConfirmation.setText(_passwordConfirmation);
         passwordConfirmation.setBounds(250, 300, 500, 30);
         this.panel.add(passwordConfirmation);
 
@@ -102,7 +108,11 @@ public class ChangePwView extends Frame implements ActionListener {
         this.setVisible(true);
     }
 
-    public static void showScreen() throws SQLException {
+    public static void showScreen(String certificatePath, String password, String passwordConfirmation) {
+        _certificatePath = certificatePath;
+        _password = password;
+        _passwordConfirmation = passwordConfirmation;
+
         Facade.registerLogMessage(7001, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
         new ChangePwView();
     }
