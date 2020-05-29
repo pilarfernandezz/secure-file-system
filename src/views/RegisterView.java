@@ -61,8 +61,7 @@ public class RegisterView extends Frame implements ActionListener {
         lblCertificate.setBounds(50, 190, 300, 50);
         this.panel.add(lblCertificate);
 
-        //TODO TIRAR CERTIFICADO
-        certificatePath = new JTextField("Keys/user01-x509.crt");
+        certificatePath = new JTextField();
         certificatePath.setBounds(250, 200, 500, 30);
         this.panel.add(certificatePath);
 
@@ -143,22 +142,21 @@ public class RegisterView extends Frame implements ActionListener {
                 this.panel.repaint();
 
                 if (!invalidCert || !invalidPw) {
-                    Facade.registerLogMessage(invalidPw ? 6003 : 6004, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
                     this.setVisible(false);
                     this.dispose();
                     try {
                         ConfirmationView.showScreen(true, certificatePath.getText(), (btnuser.isSelected() ? "Usuário" : "Administrador"), password.getText(), passwordConfirmation.getText());
                     } catch (InvalidExtractionCertificateOwnerInfoException ex) {
-                        //todo log
                         lblAlertCert.setVisible(true);
                     } catch (SQLException invalidExtractionCertificateOwnerInfoException) {
                         JOptionPane.showMessageDialog(null, "Ocorreu um erro fatal no sistema. O sistema será encerrado.");
                         Facade.registerLogMessage(1002, null, null, LocalDateTime.now());
                         System.exit(1);
                     }
+                } else {
+                    Facade.registerLogMessage(invalidPw ? 6003 : 6004, Facade.getLoggedUser().getEmail(), null, LocalDateTime.now());
                 }
             } catch (FileNotFoundException | InvalidCertificateException ex) {
-                //todo log
                 lblAlertCert.setVisible(true);
             }
         } else if (e.getSource() == btnReturn) {

@@ -47,7 +47,6 @@ public class LogRepository {
             ps.setString(5, creationDatetime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
             ps.execute();
-            //TODO LOG
             System.out.println("Log registrado com sucesso");
         } catch (Exception e) {
             System.out.println("Ocorreu um erro ao inserir a mensagem de log: \n" + e.getMessage());

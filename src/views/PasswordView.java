@@ -208,7 +208,6 @@ public class PasswordView extends Frame implements ActionListener {
                     }
                     this.typedPw = null;
                 } catch (Exception exception) {
-                    //todo log
                     lblAlert.setVisible(true);
                     this.panel.repaint();
                 }
