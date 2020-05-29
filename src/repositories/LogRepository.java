@@ -1,14 +1,14 @@
 package repositories;
 
-import models.User;
-
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class LogRepository {
     private Connection conn;
     private static LogRepository instance;
 
-    public static LogRepository getInstance() throws SQLException {
+    public static LogRepository getInstance() {
         if (instance == null)
             instance = new LogRepository();
         return instance;
@@ -27,37 +27,35 @@ public class LogRepository {
             String query = "select * from messages where id = '" + id + "';";
             ResultSet res = this.conn.createStatement().executeQuery(query);
             if (res.next()) {
-               return res.getString("message");
+                return res.getString("message");
             }
             return null;
         } catch (Exception e) {
-            System.out.println("Ocorreu um erro ao buscar o mensagem: \n" + e.getMessage());
+            System.out.println("Ocorreu um erro ao buscar a mensagem padrão: \n" + e.getMessage());
             return null;
         }
     }
 
-    public void insertLogMessage(String msg){
-        try{
-            String query = "insert into users (id,email,password,name,user_group, certificate,salt) values(?,?,?,?,?,?,?);";
+    public void insertLogMessage(String login, String arq, int code, LocalDateTime creationDatetime) {
+        try {
+            String query = "insert into registers (id, code, login, arq, creation_datetime) values(?,?,?,?,?);";
             PreparedStatement ps = this.conn.prepareStatement(query);
             ps.setInt(1, this.getNextId());
-            ps.setString(2, user.getEmail());
-            ps.setString(3, user.getPassword());
-            ps.setString(4, user.getName());
-            ps.setString(5, user.getGroup());
-            ps.setString(6, user.getCertificate());
-            ps.setString(7, user.getSalt());
+            ps.setInt(2, code);
+            ps.setString(3, login);
+            ps.setString(4, arq);
+            ps.setString(5, creationDatetime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
             ps.execute();
             //TODO LOG
-            System.out.println("Usuário criado com sucesso");
+            System.out.println("Log registrado com sucesso");
         } catch (Exception e) {
             System.out.println("Ocorreu um erro ao inserir a mensagem de log: \n" + e.getMessage());
         }
     }
 
     public int getNextId() throws SQLException {
-        String query = "select id from users order by id desc limit 1;";
+        String query = "select id from registers order by id desc limit 1;";
         ResultSet res = this.conn.createStatement().executeQuery(query);
         if (res.next())
             return res.getInt(1) + 1;
