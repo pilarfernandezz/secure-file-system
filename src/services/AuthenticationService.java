@@ -285,11 +285,9 @@ public class AuthenticationService {
     public boolean validatePassword(String pw, String pwConf) {
         for (int i = 0; i < pw.length() - 1; i++) {
             if (!pw.equals(pwConf) || pw.charAt(i) == pw.charAt(i + 1) || pw.charAt(i) == pw.charAt(i + 1) + 1 || pw.charAt(i) == pw.charAt(i + 1) - 1) {
-                System.out.println("if verify passowrd");
                 return false;
             }
         }
-        System.out.println("true");
 
         return true;
     }
