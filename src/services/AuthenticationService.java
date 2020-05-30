@@ -247,27 +247,15 @@ public class AuthenticationService {
                                             for (index[8] = 0; index[8] < 2; index[8]++) {
                                                 for (int i = 0; i < typedPw.size(); i++) {
                                                     currentPw += typedPw.get(i)[index[i]];
+                                                    String value = PasswordCipherService.getInstance().encryptPassword(currentPw + user.getSalt());
+                                                    if (value.equals(user.getPassword())) {
+                                                        return true;
+                                                    }
                                                 }
-
-                                                String value = PasswordCipherService.getInstance().encryptPassword(currentPw + user.getSalt());
-                                                if (value.equals(user.getPassword())) {
-                                                    return true;
-                                                }
-
                                                 currentPw = "";
-                                                if (typedPw.size() < 9) {
-                                                    break;
-                                                }
-                                            }
-                                            if (typedPw.size() < 8) {
-                                                break;
-                                            }
-                                        }
-                                        if (typedPw.size() < 7) {
-                                            break;
-                                        }
 
-                                        return false;
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -300,6 +288,7 @@ public class AuthenticationService {
                 return false;
             }
         }
+
         return true;
     }
 }
